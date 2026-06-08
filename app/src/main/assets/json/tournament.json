@@ -1,0 +1,40 @@
+{
+	"tournament": {
+		"id": "wc2026",
+		"name": "FIFA World Cup 2026",
+		"totalTeams": 48,
+		"totalMatches": 104,
+		"phases": [
+		  {
+			"key": "group_stage",
+			"name": "Fase de grupos",
+			"matchCount": 72
+		  },
+		  {
+			"key": "round_of_16",
+			"name": "Dieciseisavos / Octavos",
+			"matchCount": 16
+		  },
+		  {
+			"key": "quarter_finals",
+			"name": "Cuartos de final",
+			"matchCount": 4
+		  },
+		  {
+			"key": "semi_finals",
+			"name": "Semifinales",
+			"matchCount": 2
+		  },
+		  {
+			"key": "third_place_playoff",
+			"name": "Partido por el tercer lugar",
+			"matchCount": 1
+		  },
+		  {
+			"key": "final",
+			"name": "Final",
+			"matchCount": 1
+		  }
+		]
+	}
+}

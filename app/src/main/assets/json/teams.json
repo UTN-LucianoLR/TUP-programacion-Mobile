@@ -1,0 +1,293 @@
+{
+	"teams": [
+		{
+		  "id_team": 1,
+		  "name": "México",
+		  "group": "A",
+		  "code": "MEX"
+		},
+		{
+		  "id_team": 2,
+		  "name": "Sudáfrica",
+		  "group": "A",
+		  "code": "RSA"
+		},
+		{
+		  "id_team": 3,
+		  "name": "Corea del Sur",
+		  "group": "A",
+		  "code": "KOR",
+		  "aliases": []
+		},
+		{
+		  "id_team": 4,
+		  "name": "República Checa",
+		  "group": "A",
+		  "code": "CZE"
+		},
+		{
+		  "id_team": 5,
+		  "name": "Canadá",
+		  "group": "B",
+		  "code": "CAN"
+		},
+		{
+		  "id_team": 6,
+		  "name": "Suiza",
+		  "group": "B",
+		  "code": "SUI"
+		},
+		{
+		  "id_team": 7,
+		  "name": "Qatar",
+		  "group": "B",
+		  "code": "QAT"
+		},
+		{
+		  "id_team": 8,
+		  "name": "Bosnia y Herzegovina",
+		  "group": "B",
+		  "code": "BIH"
+		},
+		{
+		  "id_team": 9,
+		  "name": "Brasil",
+		  "group": "C",
+		  "code": "BRA"
+		},
+		{
+		  "id_team": 10,
+		  "name": "Marruecos",
+		  "group": "C",
+		  "code": "MAR"
+		},
+		{
+		  "id_team": 11,
+		  "name": "Haití",
+		  "group": "C",
+		  "code": "HAI"
+		},
+		{
+		  "id_team": 12,
+		  "name": "Escocia",
+		  "group": "C",
+		  "code": "SCO"
+		},
+		{
+		  "id_team": 13,
+		  "name": "Estados Unidos",
+		  "group": "D",
+		  "code": "USA"
+		},
+		{
+		  "id_team": 14,
+		  "name": "Paraguay",
+		  "group": "D",
+		  "code": "PAR"
+		},
+		{
+		  "id_team": 15,
+		  "name": "Australia",
+		  "group": "D",
+		  "code": "AUS"
+		},
+		{
+		  "id_team": 16,
+		  "name": "Turquía",
+		  "group": "D",
+		  "code": "TUR"
+		},
+		{
+		  "id_team": 17,
+		  "name": "Alemania",
+		  "group": "E",
+		  "code": "GER"
+		},
+		{
+		  "id_team": 18,
+		  "name": "Curazao",
+		  "group": "E",
+		  "code": "CUR"
+		},
+		{
+		  "id_team": 19,
+		  "name": "Costa de Marfil",
+		  "group": "E",
+		  "code": "CIV"
+		},
+		{
+		  "id_team": 20,
+		  "name": "Ecuador",
+		  "group": "E",
+		  "code": "ECU"
+		},
+		{
+		  "id_team": 21,
+		  "name": "Países Bajos",
+		  "group": "F",
+		  "code": "NED"
+		},
+		{
+		  "id_team": 22,
+		  "name": "Japón",
+		  "group": "F",
+		  "code": "JAP"
+		},
+		{
+		  "id_team": 23,
+		  "name": "Túnez",
+		  "group": "F",
+		  "code": "TUN"
+		},
+		{
+		  "id_team": 24,
+		  "name": "Suecia",
+		  "group": "F",
+		  "code": "SWE"
+		},
+		{
+		  "id_team": 25,
+		  "name": "Bélgica",
+		  "group": "G",
+		  "code": "BEL"
+		},
+		{
+		  "id_team": 26,
+		  "name": "Egipto",
+		  "group": "G",
+		  "code": "EGY"
+		},
+		{
+		  "id_team": 27,
+		  "name": "Irán",
+		  "group": "G",
+		  "code": "IRN"
+		},
+		{
+		  "id_team": 28,
+		  "name": "Nueva Zelanda",
+		  "group": "G",
+		  "code": "NZL"
+		},
+		{
+		  "id_team": 29,
+		  "name": "España",
+		  "group": "H",
+		  "code": "ESP"
+		},
+		{
+		  "id_team": 30,
+		  "name": "Cabo Verde",
+		  "group": "H",
+		  "code": "CPV"
+		},
+		{
+		  "id_team": 31,
+		  "name": "Arabia Saudita",
+		  "group": "H",
+		  "code": "KSA"
+		},
+		{
+		  "id_team": 32,
+		  "name": "Uruguay",
+		  "group": "H",
+		  "code": "URU"
+		},
+		{
+		  "id_team": 33,
+		  "name": "Francia",
+		  "group": "I",
+		  "code": "FRA"
+		},
+		{
+		  "id_team": 34,
+		  "name": "Senegal",
+		  "group": "I",
+		  "code": "SEN"
+		},
+		{
+		  "id_team": 35,
+		  "name": "Noruega",
+		  "group": "I",
+		  "code": "NOR"
+		},
+		{
+		  "id_team": 36,
+		  "name": "Irak",
+		  "group": "I",
+		  "code": "IRQ"
+		},
+		{
+		  "id_team": 37,
+		  "name": "Argentina",
+		  "group": "J",
+		  "code": "ARG"
+		},
+		{
+		  "id_team": 38,
+		  "name": "Argelia",
+		  "group": "J",
+		  "code": "ALG"
+		},
+		{
+		  "id_team": 39,
+		  "name": "Austria",
+		  "group": "J",
+		  "code": "AUT"
+		},
+		{
+		  "id_team": 40,
+		  "name": "Jordania",
+		  "group": "J",
+		  "code": "JOR"
+		},
+		{
+		  "id_team": 41,
+		  "name": "Portugal",
+		  "group": "K",
+		  "code": "POR"
+		},
+		{
+		  "id_team": 42,
+		  "name": "Uzbekistán",
+		  "group": "K",
+		  "code": "UZB"
+		},
+		{
+		  "id_team": 43,
+		  "name": "Colombia",
+		  "group": "K",
+		  "code": "COL"
+		},
+		{
+		  "id_team": 44,
+		  "name": "República Democrática del Congo",
+		  "group": "K",
+		  "code": "COD"
+		},
+		{
+		  "id_team": 45,
+		  "name": "Inglaterra",
+		  "group": "L",
+		  "code": "ENG"
+		},
+		{
+		  "id_team": 46,
+		  "name": "Croacia",
+		  "group": "L",
+		  "code": "CRO"
+		},
+		{
+		  "id_team": 47,
+		  "name": "Ghana",
+		  "group": "L",
+		  "code": "GHA"
+		},
+		{
+		  "id_team": 48,
+		  "name": "Panamá",
+		  "group": "L",
+		  "code": "PAN"
+		}
+	]
+}

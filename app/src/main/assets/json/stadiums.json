@@ -1,0 +1,132 @@
+{
+	"stadiums": [
+		{
+		  "id_stadium": 1,
+		  "city": "Ciudad de México",
+		  "country": "México",
+		  "stadiumName": "Estadio Azteca",
+		  "capacity": 83000,
+		  "displayVenueName": "Estadio Ciudad de México"
+		},
+		{
+		  "id_stadium": 2,
+		  "city": "Guadalajara",
+		  "country": "México",
+		  "stadiumName": "Estadio Akron",
+		  "capacity": 48000,
+		  "displayVenueName": "Estadio Guadalajara"
+		},
+		{
+		  "id_stadium": 3,
+		  "city": "Monterrey",
+		  "country": "México",
+		  "stadiumName": "Estadio BBVA",
+		  "capacity": 53500,
+		  "displayVenueName": "Estadio Monterrey"
+		},
+		{
+		  "id_stadium": 4,
+		  "city": "Atlanta",
+		  "country": "Estados Unidos",
+		  "stadiumName": "Mercedes-Benz Stadium",
+		  "capacity": 75000,
+		  "displayVenueName": "Estadio Atlanta"
+		},
+		{
+		  "id_stadium": 5,
+		  "city": "Boston",
+		  "country": "Estados Unidos",
+		  "stadiumName": "Gillette Stadium",
+		  "capacity": 65000,
+		  "displayVenueName": "Estadio Boston"
+		},
+		{
+		  "id_stadium": 6,
+		  "city": "Dallas",
+		  "country": "Estados Unidos",
+		  "stadiumName": "AT&T Stadium",
+		  "capacity": 94000,
+		  "displayVenueName": "Estadio Dallas"
+		},
+		{
+		  "id_stadium": 7,
+		  "city": "Houston",
+		  "country": "Estados Unidos",
+		  "stadiumName": "NRG Stadium",
+		  "capacity": 72000,
+		  "displayVenueName": "Estadio Houston"
+		},
+		{
+		  "id_stadium": 8,
+		  "city": "Kansas City",
+		  "country": "Estados Unidos",
+		  "stadiumName": "Arrowhead Stadium",
+		  "capacity": 73000,
+		  "displayVenueName": "Estadio Kansas City"
+		},
+		{
+		  "id_stadium": 9,
+		  "city": "Los Angeles",
+		  "country": "Estados Unidos",
+		  "stadiumName": "SoFi Stadium",
+		  "capacity": 70000,
+		  "displayVenueName": "Estadio Los Angeles"
+		},
+		{
+		  "id_stadium": 10,
+		  "city": "Miami",
+		  "country": "Estados Unidos",
+		  "stadiumName": "Hard Rock Stadium",
+		  "capacity": 65000,
+		  "displayVenueName": "Estadio Miami"
+		},
+		{
+		  "id_stadium": 11,
+		  "city": "New York/New Jersey",
+		  "country": "Estados Unidos",
+		  "stadiumName": "MetLife Stadium",
+		  "capacity": 82500,
+		  "displayVenueName": "Estadio Nueva York Nueva Jersey"
+		},
+		{
+		  "id_stadium": 12,
+		  "city": "Philadelphia",
+		  "country": "Estados Unidos",
+		  "stadiumName": "Lincoln Financial Field",
+		  "capacity": 69000,
+		  "displayVenueName": "Estadio Filadelfia"
+		},
+		{
+		  "id_stadium": 13,
+		  "city": "San Francisco Bay Area",
+		  "country": "Estados Unidos",
+		  "stadiumName": "Levi's Stadium",
+		  "capacity": 71000,
+		  "displayVenueName": "Estadio San Francisco"
+		},
+		{
+		  "id_stadium": 14,
+		  "city": "Seattle",
+		  "country": "Estados Unidos",
+		  "stadiumName": "Lumen Field",
+		  "capacity": 69000,
+		  "displayVenueName": "Estadio Seattle"
+		},
+		{
+		  "id_stadium": 15,
+		  "city": "Toronto",
+		  "country": "Canadá",
+		  "stadiumName": "BMO Field",
+		  "capacity": 45000,
+		  "displayVenueName": "Estadio Toronto"
+		},
+		{
+		  "id_stadium": 16,
+		  "city": "Vancouver",
+		  "country": "Canadá",
+		  "stadiumName": "BC Place",
+		  "capacity": 54000,
+		  "displayVenueName": "Estadio Vancouver"
+		}
+	]
+}

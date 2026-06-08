@@ -1,15 +1,44 @@
+## ── Android / Gradle ──────────────────────────────────────────────────────────
 *.iml
-.gradle
+.gradle/
 /local.properties
-/.idea/caches
-/.idea/libraries
+local.properties
+/build/
+**/build/
+/captures/
+.externalNativeBuild/
+.cxx/
+
+## ── IDE – IntelliJ / Android Studio ─────────────────────────────────────────
+/.idea/caches/
+/.idea/libraries/
 /.idea/modules.xml
 /.idea/workspace.xml
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
+/.idea/.gitignore
+.idea/
+
+## ── OS ────────────────────────────────────────────────────────────────────────
 .DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
-local.properties
+Thumbs.db
+desktop.ini
+
+## ── Kotlin ────────────────────────────────────────────────────────────────────
+*.class
+*.kotlin_module
+
+## ── Keystore / credenciales (NUNCA versionar) ────────────────────────────────
+*.jks
+*.keystore
+keystore.properties
+google-services.json
+/app/google-services.json
+
+## ── Room – esquemas generados (opcional: versionar si se usan migraciones) ───
+# Descomenta la siguiente línea si NO querés versionar los schemas de Room:
+# /app/schemas/
+
+## ── Gradle wrapper ────────────────────────────────────────────────────────────
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
