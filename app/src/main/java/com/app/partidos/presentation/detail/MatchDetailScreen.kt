@@ -13,16 +13,18 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.layout.ContentScale
 import coil.ImageLoader
-import coil.compose.AsyncImage
+import coil.compose.SubcomposeAsyncImage
 import coil.decode.SvgDecoder
 
 @Composable
 fun MatchDetailScreen(
     onNavigateBack: () -> Unit,
     onNavigateToPurchase: (String) -> Unit,
+    onNavigateToLogin: () -> Unit,
     viewModel: MatchDetailViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val isLoggedIn by viewModel.isLoggedIn.collectAsState()
     val context = LocalContext.current
     val imageLoader = androidx.compose.runtime.remember {
         ImageLoader.Builder(context)
@@ -35,8 +37,12 @@ fun MatchDetailScreen(
     Column(modifier = Modifier.padding(16.dp).fillMaxSize()) {
         when (val state = uiState) {
             is MatchDetailUiState.Loading -> {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+                    LinearProgressIndicator(
+                        modifier = Modifier.fillMaxWidth(),
+                        color = MaterialTheme.colorScheme.primary,
+                        trackColor = MaterialTheme.colorScheme.primaryContainer
+                    )
                 }
             }
             is MatchDetailUiState.Error -> {
@@ -59,23 +65,25 @@ fun MatchDetailScreen(
                     horizontalArrangement = Arrangement.Center,
                     modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
                 ) {
-                    AsyncImage(
+                    SubcomposeAsyncImage(
                         model = "file:///android_asset/flags/${partido.codigoLocal}.svg",
                         contentDescription = "Bandera ${partido.equipoLocal}",
                         imageLoader = imageLoader,
                         modifier = Modifier.size(40.dp).padding(end = 8.dp),
-                        contentScale = ContentScale.Fit
+                        contentScale = ContentScale.Fit,
+                        loading = { CircularProgressIndicator(modifier = Modifier.padding(8.dp), strokeWidth = 2.dp) }
                     )
                     Text(
                         text = "${partido.equipoLocal} vs ${partido.equipoVisitante}",
                         style = MaterialTheme.typography.titleLarge
                     )
-                    AsyncImage(
+                    SubcomposeAsyncImage(
                         model = "file:///android_asset/flags/${partido.codigoVisitante}.svg",
                         contentDescription = "Bandera ${partido.equipoVisitante}",
                         imageLoader = imageLoader,
                         modifier = Modifier.size(40.dp).padding(start = 8.dp),
-                        contentScale = ContentScale.Fit
+                        contentScale = ContentScale.Fit,
+                        loading = { CircularProgressIndicator(modifier = Modifier.padding(8.dp), strokeWidth = 2.dp) }
                     )
                 }
                 
@@ -92,7 +100,10 @@ fun MatchDetailScreen(
                 Spacer(modifier = Modifier.weight(1f))
 
                 Button(
-                    onClick = { onNavigateToPurchase(partido.id) },
+                    onClick = { 
+                        if (isLoggedIn) onNavigateToPurchase(partido.id)
+                        else onNavigateToLogin()
+                    },
                     enabled = partido.disponible,
                     modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
                 ) {

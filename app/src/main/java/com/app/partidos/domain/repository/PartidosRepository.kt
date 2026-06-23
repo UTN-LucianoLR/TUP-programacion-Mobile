@@ -10,10 +10,10 @@ interface PartidosRepository {
     
     fun getPartidosFlow(): Flow<List<Partido>>
     
-    suspend fun getPartidoById(partidoId: String): Partido? // partidoId ahora es String
+    suspend fun getPartidoById(partidoId: String): Partido?
     
-    // Como Pago ya no tiene los IDs, se los pasamos al repositorio
+    
     suspend fun procesarCompra(pago: Pago, usuarioId: String, partidoId: String, cantidad: Int): Result<Compra>
     
-    fun getHistorialComprasFlow(usuarioId: String): Flow<List<Compra>> // usuarioId ahora es String
+    fun getHistorialComprasFlow(usuarioId: String): Flow<List<Compra>>
 }

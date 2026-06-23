@@ -10,10 +10,10 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface CompraDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertCompra(compra: CompraEntity) // No devuelve Long (String ID)
+    suspend fun insertCompra(compra: CompraEntity)
 
     @Query("SELECT * FROM compras WHERE usuarioId = :usuarioId ORDER BY fechaCompra DESC")
-    fun getComprasByUsuarioFlow(usuarioId: String): Flow<List<CompraEntity>> // usuarioId ahora es String
+    fun getComprasByUsuarioFlow(usuarioId: String): Flow<List<CompraEntity>>
 
     @Query("SELECT * FROM compras WHERE id = :compraId LIMIT 1")
     suspend fun getCompraById(compraId: String): CompraEntity?
