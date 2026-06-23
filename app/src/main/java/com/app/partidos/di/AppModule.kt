@@ -17,17 +17,16 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import okhttp3.Interceptor
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
-import okhttp3.Protocol
-import okhttp3.Response
-import okhttp3.ResponseBody.Companion.toResponseBody
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.util.UUID
 import javax.inject.Singleton
+import com.app.partidos.data.local.preferences.AuthPreferences
+import com.app.partidos.data.remote.interceptor.AuthInterceptor
+import com.app.partidos.data.remote.AuthApiService
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -56,9 +55,25 @@ object AppModule {
     // --- RETROFIT ---
     @Provides
     @Singleton
-    fun provideOkHttpClient(@ApplicationContext context: Context): OkHttpClient {
+    fun provideAuthPreferences(@ApplicationContext context: Context): AuthPreferences {
+        return AuthPreferences(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideAuthInterceptor(authPreferences: AuthPreferences): AuthInterceptor {
+        return AuthInterceptor {
+            runBlocking {
+                authPreferences.tokenFlow.firstOrNull()
+            }
+        }
+    }
+
+    @Provides
+    @Singleton
+    fun provideOkHttpClient(authInterceptor: AuthInterceptor): OkHttpClient {
         return OkHttpClient.Builder()
-            .addInterceptor(MockApiInterceptor(context))
+            .addInterceptor(authInterceptor)
             .addInterceptor(HttpLoggingInterceptor().apply {
                 level = HttpLoggingInterceptor.Level.BODY
             })
@@ -76,11 +91,25 @@ object AppModule {
             .create(PartidosApi::class.java)
     }
 
+    @Provides
+    @Singleton
+    fun provideAuthApi(client: OkHttpClient): AuthApiService {
+        return Retrofit.Builder()
+            .baseUrl(BuildConfig.API_BASE_URL)
+            .client(client)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(AuthApiService::class.java)
+    }
+
     // --- REPOSITORIES ---
     @Provides
     @Singleton
-    fun provideAuthRepository(usuarioDao: UsuarioDao): AuthRepository {
-        return AuthRepositoryImpl(usuarioDao)
+    fun provideAuthRepository(
+        authApi: AuthApiService,
+        authPreferences: AuthPreferences
+    ): AuthRepository {
+        return AuthRepositoryImpl(authApi, authPreferences)
     }
 
     @Provides
@@ -94,75 +123,3 @@ object AppModule {
     }
 }
 
-class MockApiInterceptor(private val context: Context) : Interceptor {
-    override fun intercept(chain: Interceptor.Chain): Response {
-        val request = chain.request()
-        val path = request.url.encodedPath
-
-        if (path.contains("matches")) {
-            val json = context.assets.open("json/matches.json").bufferedReader().use { it.readText() }
-            return Response.Builder()
-                .code(200)
-                .message("OK")
-                .protocol(Protocol.HTTP_1_1)
-                .request(request)
-                .body(json.toResponseBody("application/json".toMediaTypeOrNull()))
-                .build()
-        }
-
-        if (path.contains("teams")) {
-            val json = context.assets.open("json/teams.json").bufferedReader().use { it.readText() }
-            return Response.Builder()
-                .code(200)
-                .message("OK")
-                .protocol(Protocol.HTTP_1_1)
-                .request(request)
-                .body(json.toResponseBody("application/json".toMediaTypeOrNull()))
-                .build()
-        }
-
-        if (path.contains("stadiums")) {
-            val json = context.assets.open("json/stadiums.json").bufferedReader().use { it.readText() }
-            return Response.Builder()
-                .code(200)
-                .message("OK")
-                .protocol(Protocol.HTTP_1_1)
-                .request(request)
-                .body(json.toResponseBody("application/json".toMediaTypeOrNull()))
-                .build()
-        }
-
-        if (path.contains("tournaments")) {
-            val json = context.assets.open("json/tournament.json").bufferedReader().use { it.readText() }
-            return Response.Builder()
-                .code(200)
-                .message("OK")
-                .protocol(Protocol.HTTP_1_1)
-                .request(request)
-                .body(json.toResponseBody("application/json".toMediaTypeOrNull()))
-                .build()
-        }
-
-        if (path.contains("payments")) {
-            val successJson = """
-                {
-                    "success": true,
-                    "transaction_id": "${UUID.randomUUID()}",
-                    "message": "Pago procesado exitosamente (Mock)",
-                    "total_amount": 100.0,
-                    "currency": "USD",
-                    "purchase_date": "2026-06-05T00:00:00Z"
-                }
-            """.trimIndent()
-            return Response.Builder()
-                .code(200)
-                .message("OK")
-                .protocol(Protocol.HTTP_1_1)
-                .request(request)
-                .body(successJson.toResponseBody("application/json".toMediaTypeOrNull()))
-                .build()
-        }
-
-        return chain.proceed(request)
-    }
-}

@@ -6,6 +6,7 @@ plugins {
     kotlin("plugin.compose")
     id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
+    alias(libs.plugins.kotlin.serialization)
 }
 
 // ── Lectura de local.properties con fallo elegante ───────────────────────────
@@ -129,6 +130,9 @@ dependencies {
 
     // ── DataStore ─────────────────────────────────────────────────────────────
     implementation(libs.androidx.datastore.preferences)
+
+    // ── Serialization ─────────────────────────────────────────────────────────
+    implementation(libs.kotlinx.serialization.json)
 
     // ── Coil ──────────────────────────────────────────────────────────────────
     implementation(libs.coil.compose)
