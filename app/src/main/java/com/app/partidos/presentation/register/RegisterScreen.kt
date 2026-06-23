@@ -33,12 +33,14 @@ fun RegisterScreen(
             value = uiState.nombre,
             onValueChange = { viewModel.onNombreChanged(it) },
             label = { Text("Nombre") },
+            singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
         OutlinedTextField(
             value = uiState.email,
             onValueChange = { viewModel.onEmailChanged(it) },
             label = { Text("Email") },
+            singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
         OutlinedTextField(
@@ -46,6 +48,15 @@ fun RegisterScreen(
             onValueChange = { viewModel.onPasswordChanged(it) },
             label = { Text("Contraseña") },
             visualTransformation = PasswordVisualTransformation(),
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
+        )
+        OutlinedTextField(
+            value = uiState.confirmarPassword,
+            onValueChange = { viewModel.onConfirmarPasswordChanged(it) },
+            label = { Text("Confirmar Contraseña") },
+            visualTransformation = PasswordVisualTransformation(),
+            singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
 

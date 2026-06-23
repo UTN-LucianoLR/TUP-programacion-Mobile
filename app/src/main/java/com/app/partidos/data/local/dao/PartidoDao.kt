@@ -16,7 +16,7 @@ interface PartidoDao {
     fun getPartidosFlow(): Flow<List<PartidoEntity>>
 
     @Query("SELECT * FROM partidos WHERE id = :partidoId LIMIT 1")
-    suspend fun getPartidoById(partidoId: String): PartidoEntity? // partidoId ahora es String
+    suspend fun getPartidoById(partidoId: String): PartidoEntity?
 
     @Query("SELECT COUNT(*) FROM partidos")
     suspend fun countPartidos(): Int

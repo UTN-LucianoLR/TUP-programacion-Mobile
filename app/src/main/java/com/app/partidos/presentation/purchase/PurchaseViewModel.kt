@@ -52,33 +52,89 @@ class PurchaseViewModel @Inject constructor(
     fun onVencimientoChanged(v: String) { _uiState.value = _uiState.value.copy(vencimiento = v) }
     fun onCvvChanged(c: String) { _uiState.value = _uiState.value.copy(cvv = c) }
 
+    fun onMetodoPagoChanged(metodo: String) {
+        _uiState.value = _uiState.value.copy(
+            metodoPago = metodo,
+            error = null
+        )
+    }
+
     fun validarYContinuar(onSuccess: (Pago) -> Unit) {
-        val st = _uiState.value
+        val st   = _uiState.value
         val cant = st.cantidad.toIntOrNull() ?: 0
-        
+
+        // Validación de cantidad (aplica a todos los métodos)
         if (cant < 1 || cant > 10) {
             _uiState.value = st.copy(error = "Puede comprar entre 1 y 10 entradas")
             return
         }
-        if (st.numeroTarjeta.isBlank() || st.nombreTitular.isBlank() || st.vencimiento.isBlank() || st.cvv.isBlank()) {
-            _uiState.value = st.copy(error = "Complete los datos bancarios")
+
+        // Si el método es Transferencia: omitir validación de tarjeta
+        if (st.metodoPago == "Transferencia") {
+            val pago = Pago(
+                metodoPago    = "Transferencia",
+                monto         = st.totalCalculado
+                // Campos de tarjeta quedan null por defecto
+            )
+            _uiState.value = st.copy(error = null)
+            onSuccess(pago)
             return
         }
-        
+
+        // Validaciones Regex para Tarjeta (mismas que en compra.js — Sección 3.7 del plan)
+        val regexTarjeta     = Regex("""^\d{16}$""")
+        val regexCvv         = Regex("""^\d{3,4}$""")
+        val regexTitular     = Regex("""^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$""")
+        val regexVencimiento = Regex("""^(0[1-9]|1[0-2])/\d{2}$""")
+
+        if (!regexTarjeta.matches(st.numeroTarjeta)) {
+            _uiState.value = st.copy(error = "El número de tarjeta debe tener exactamente 16 dígitos.")
+            return
+        }
+        if (!regexTitular.matches(st.nombreTitular)) {
+            _uiState.value = st.copy(error = "El titular solo puede contener letras y espacios.")
+            return
+        }
+        if (!regexVencimiento.matches(st.vencimiento) || !esVencimientoFuturo(st.vencimiento)) {
+            _uiState.value = st.copy(error = "Ingresá un vencimiento válido y futuro (MM/AA).")
+            return
+        }
+        if (!regexCvv.matches(st.cvv)) {
+            _uiState.value = st.copy(error = "El CVV debe tener 3 o 4 dígitos.")
+            return
+        }
+
         val pago = Pago(
+            metodoPago    = "Tarjeta",
+            monto         = st.totalCalculado,
             numeroTarjeta = st.numeroTarjeta,
             nombreTitular = st.nombreTitular,
-            vencimiento = st.vencimiento,
-            cvv = st.cvv,
-            monto = st.totalCalculado
+            vencimiento   = st.vencimiento,
+            cvv           = st.cvv
         )
+        _uiState.value = st.copy(error = null)
         onSuccess(pago)
+    }
+
+    private fun esVencimientoFuturo(vencimiento: String): Boolean {
+        return try {
+            val partes     = vencimiento.split("/")
+            val mes        = partes[0].toInt()
+            val anio       = 2000 + partes[1].toInt()
+            val ahora      = java.util.Calendar.getInstance()
+            val anioActual = ahora.get(java.util.Calendar.YEAR)
+            val mesActual  = ahora.get(java.util.Calendar.MONTH) + 1
+            anio > anioActual || (anio == anioActual && mes >= mesActual)
+        } catch (_: Exception) {
+            false
+        }
     }
 }
 
 data class PurchaseUiState(
     val partido: Partido? = null,
     val cantidad: String = "1",
+    val metodoPago: String = "Tarjeta",
     val numeroTarjeta: String = "",
     val nombreTitular: String = "",
     val vencimiento: String = "",

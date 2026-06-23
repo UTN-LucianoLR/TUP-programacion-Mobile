@@ -26,16 +26,18 @@ fun LoginScreen(
         
         OutlinedTextField(
             value = uiState.email,
-            onValueChange = { viewModel.onEmailChanged(it) },
+            onValueChange = { if (it.length <= 45) viewModel.onEmailChanged(it) },
             label = { Text("Email") },
+            singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
         
         OutlinedTextField(
             value = uiState.password,
-            onValueChange = { viewModel.onPasswordChanged(it) },
+            onValueChange = { if (it.length <= 15) viewModel.onPasswordChanged(it) },
             label = { Text("Contraseña") },
             visualTransformation = PasswordVisualTransformation(),
+            singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
 
