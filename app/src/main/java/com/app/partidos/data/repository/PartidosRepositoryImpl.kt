@@ -63,9 +63,12 @@ class PartidosRepositoryImpl(
             val request = CrearCompraDto(
                 usuarioId = usuarioId.toInt(),
                 pago = CrearPagoDto(
-                    metodoPago = "Tarjeta",
-                    estadoPago = "Aprobado",
-                    monto = pago.monto
+                    metodoPago    = pago.metodoPago,
+                    monto         = pago.monto,
+                    numeroTarjeta = pago.numeroTarjeta,
+                    titular       = pago.nombreTitular,
+                    vencimiento   = pago.vencimiento,
+                    cvv           = pago.cvv
                 ),
                 tickets = tickets
             )
@@ -87,7 +90,7 @@ class PartidosRepositoryImpl(
                 Result.failure(Exception("La respuesta de la API no contiene un ID válido"))
             }
         } catch (e: Exception) {
-            Result.failure(Exception("Error procesando pago: ${e.message}"))
+            Result.failure(e)
         }
     }
 
