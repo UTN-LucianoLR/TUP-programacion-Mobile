@@ -12,6 +12,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 // import com.app.partidos.domain.model.Partido
@@ -29,37 +30,41 @@ fun HomeScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Partidos") },
+                title = { Text("Partidos del Mundial", color = Color.White) },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color(0xFF101F3D)
+                ),
                 actions = {
                     TextButton(onClick = onNavigateToTickets) {
-                        Text("Mis Tickets")
+                        Text("Mis Tickets", color = Color.White)
                     }
                     IconButton(onClick = {
                         viewModel.logout()
                         onNavigateToLogin()
                     }) {
-                        Icon(imageVector = Icons.Default.ExitToApp, contentDescription = "Cerrar sesión")
+                        Icon(
+                            imageVector = Icons.Default.ExitToApp,
+                            contentDescription = "Cerrar sesión",
+                            tint = Color.White
+                        )
                     }
                 }
             )
-        }
+        },
+        containerColor = Color(0xFF101F3D)
     ) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
             Spacer(modifier = Modifier.height(8.dp))
 
         when (val state = uiState) {
             is HomeUiState.Loading -> {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
-                    LinearProgressIndicator(
-                        modifier = Modifier.fillMaxWidth(),
-                        color = MaterialTheme.colorScheme.primary,
-                        trackColor = MaterialTheme.colorScheme.primaryContainer
-                    )
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = Color(0xFFE63946))
                 }
             }
             is HomeUiState.Empty -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("No hay partidos disponibles.")
+                    Text("No hay partidos disponibles.", color = Color.White)
                 }
             }
             is HomeUiState.Error -> {

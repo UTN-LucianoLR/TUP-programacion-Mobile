@@ -8,6 +8,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.app.partidos.domain.model.Pago
@@ -30,11 +31,20 @@ fun ValidationScreen(
 
     when (val state = uiState) {
         is PaymentUiState.Idle, is PaymentUiState.Processing -> {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    CircularProgressIndicator()
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text("Procesando pago seguro...", style = MaterialTheme.typography.titleMedium)
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                color = Color(0xFF101F3D)
+            ) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        CircularProgressIndicator(color = Color(0xFFE63946))
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            "Procesando pago seguro...",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = Color.White
+                        )
+                    }
                 }
             }
         }

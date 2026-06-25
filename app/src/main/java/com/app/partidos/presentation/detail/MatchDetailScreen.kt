@@ -7,6 +7,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 
@@ -34,84 +35,106 @@ fun MatchDetailScreen(
             .build()
     }
 
-    Column(modifier = Modifier.padding(16.dp).fillMaxSize()) {
-        when (val state = uiState) {
-            is MatchDetailUiState.Loading -> {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
-                    LinearProgressIndicator(
-                        modifier = Modifier.fillMaxWidth(),
-                        color = MaterialTheme.colorScheme.primary,
-                        trackColor = MaterialTheme.colorScheme.primaryContainer
-                    )
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = Color(0xFF101F3D)
+    ) {
+        Column(modifier = Modifier.padding(16.dp).fillMaxSize()) {
+            when (val state = uiState) {
+                is MatchDetailUiState.Loading -> {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(color = Color(0xFFE63946))
+                    }
                 }
-            }
-            is MatchDetailUiState.Error -> {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("Error: ${state.message}", color = MaterialTheme.colorScheme.error)
-                        Button(onClick = onNavigateBack, modifier = Modifier.padding(top = 16.dp)) {
-                            Text("Volver al Listado")
+                is MatchDetailUiState.Error -> {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text("Error: ${state.message}", color = MaterialTheme.colorScheme.error)
+                            Button(
+                                onClick = onNavigateBack,
+                                modifier = Modifier.padding(top = 16.dp),
+                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE63946))
+                            ) {
+                                Text("Volver al Listado")
+                            }
                         }
                     }
                 }
-            }
-            is MatchDetailUiState.Success -> {
-                val partido = state.partido
-                Text("Detalles del Partido", style = MaterialTheme.typography.headlineMedium)
-                Spacer(modifier = Modifier.height(16.dp))
-                
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center,
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
-                ) {
-                    SubcomposeAsyncImage(
-                        model = "file:///android_asset/flags/${partido.codigoLocal}.svg",
-                        contentDescription = "Bandera ${partido.equipoLocal}",
-                        imageLoader = imageLoader,
-                        modifier = Modifier.size(40.dp).padding(end = 8.dp),
-                        contentScale = ContentScale.Fit,
-                        loading = { CircularProgressIndicator(modifier = Modifier.padding(8.dp), strokeWidth = 2.dp) }
-                    )
+                is MatchDetailUiState.Success -> {
+                    val partido = state.partido
                     Text(
-                        text = "${partido.equipoLocal} vs ${partido.equipoVisitante}",
-                        style = MaterialTheme.typography.titleLarge
+                        "Detalles del Partido",
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = Color.White
                     )
-                    SubcomposeAsyncImage(
-                        model = "file:///android_asset/flags/${partido.codigoVisitante}.svg",
-                        contentDescription = "Bandera ${partido.equipoVisitante}",
-                        imageLoader = imageLoader,
-                        modifier = Modifier.size(40.dp).padding(start = 8.dp),
-                        contentScale = ContentScale.Fit,
-                        loading = { CircularProgressIndicator(modifier = Modifier.padding(8.dp), strokeWidth = 2.dp) }
-                    )
-                }
-                
-                Text("Estadio: ${partido.estadio}")
-                Text("Fecha: ${partido.fecha}")
-                Text("Hora: ${partido.hora}")
-                Text("Precio unitario: \$${partido.precio}")
-                Text(
-                    text = if (partido.disponible) "Entradas disponibles: ${partido.entradasDisponibles}" else "Agotado",
-                    color = if (partido.disponible) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
-                    modifier = Modifier.padding(top = 8.dp)
-                )
+                    Spacer(modifier = Modifier.height(16.dp))
 
-                Spacer(modifier = Modifier.weight(1f))
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFFE63946)),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Center,
+                                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+                            ) {
+                                SubcomposeAsyncImage(
+                                    model = "file:///android_asset/flags/${partido.codigoLocal}.svg",
+                                    contentDescription = "Bandera ${partido.equipoLocal}",
+                                    imageLoader = imageLoader,
+                                    modifier = Modifier.size(40.dp).padding(end = 8.dp),
+                                    contentScale = ContentScale.Fit,
+                                    loading = { CircularProgressIndicator(modifier = Modifier.padding(8.dp), strokeWidth = 2.dp) }
+                                )
+                                Text(
+                                    text = "${partido.equipoLocal} vs ${partido.equipoVisitante}",
+                                    style = MaterialTheme.typography.titleLarge,
+                                    color = Color.White
+                                )
+                                SubcomposeAsyncImage(
+                                    model = "file:///android_asset/flags/${partido.codigoVisitante}.svg",
+                                    contentDescription = "Bandera ${partido.equipoVisitante}",
+                                    imageLoader = imageLoader,
+                                    modifier = Modifier.size(40.dp).padding(start = 8.dp),
+                                    contentScale = ContentScale.Fit,
+                                    loading = { CircularProgressIndicator(modifier = Modifier.padding(8.dp), strokeWidth = 2.dp) }
+                                )
+                            }
 
-                Button(
-                    onClick = { 
-                        if (isLoggedIn) onNavigateToPurchase(partido.id)
-                        else onNavigateToLogin()
-                    },
-                    enabled = partido.disponible,
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
-                ) {
-                    Text("Comprar Entradas")
-                }
-                
-                OutlinedButton(onClick = onNavigateBack, modifier = Modifier.fillMaxWidth()) {
-                    Text("Volver")
+                            Text("🏟 Estadio: ${partido.estadio}", color = Color.White)
+                            Text("📅 Fecha: ${partido.fecha}", color = Color.White)
+                            Text("🕒 Hora: ${partido.hora}", color = Color.White)
+                            Text("💲 Precio unitario: \$${partido.precio}", color = Color.White)
+                            Text(
+                                text = if (partido.disponible) "🎟 Entradas disponibles: ${partido.entradasDisponibles}" else "❌ Agotado",
+                                color = if (partido.disponible) Color.White else Color.Yellow,
+                                modifier = Modifier.padding(top = 8.dp)
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    Button(
+                        onClick = {
+                            if (isLoggedIn) onNavigateToPurchase(partido.id)
+                            else onNavigateToLogin()
+                        },
+                        enabled = partido.disponible,
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE63946))
+                    ) {
+                        Text("Comprar Entradas")
+                    }
+
+                    OutlinedButton(
+                        onClick = onNavigateBack,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Volver", color = Color.White)
+                    }
                 }
             }
         }
