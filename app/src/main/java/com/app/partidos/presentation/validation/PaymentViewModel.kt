@@ -51,7 +51,19 @@ class PaymentViewModel @Inject constructor(
             result.onSuccess { compra ->
                 _uiState.value = PaymentUiState.Approved(compra)
             }.onFailure { error ->
-                _uiState.value = PaymentUiState.Rejected(error.message ?: "Pago rechazado")
+                if (error is retrofit2.HttpException) {
+                    val errorBody = error.response()?.errorBody()?.string()
+                    val mensaje = try {
+                        org.json.JSONObject(errorBody ?: "{}").getString("mensaje")
+                    } catch (_: Exception) {
+                        "Error al procesar el pago."
+                    }
+                    _uiState.value = PaymentUiState.Rejected(message = mensaje)
+                } else if (error is java.io.IOException) {
+                    _uiState.value = PaymentUiState.Rejected(message = "Sin conexión. Verificá tu red e intentá nuevamente.")
+                } else {
+                    _uiState.value = PaymentUiState.Rejected(error.message ?: "Pago rechazado")
+                }
             }
         }
     }

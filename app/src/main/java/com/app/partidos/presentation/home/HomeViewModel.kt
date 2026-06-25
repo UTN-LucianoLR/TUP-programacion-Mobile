@@ -40,15 +40,20 @@ class HomeViewModel @Inject constructor(
             val result = repository.getPartidos(forceRefresh = true)
             if (result.isFailure) {
                 _uiState.value = HomeUiState.Error(result.exceptionOrNull()?.message ?: "Error desconocido")
+            } else {
+                // Solo si la API responde con una lista vacía y no hay nada en la BD
+                if (_uiState.value is HomeUiState.Loading) {
+                    _uiState.value = HomeUiState.Empty
+                }
             }
         }
 
         viewModelScope.launch {
             repository.getPartidosFlow().collectLatest { partidos ->
-                if (partidos.isEmpty() && _uiState.value !is HomeUiState.Error) {
-                    _uiState.value = HomeUiState.Empty
-                } else if (partidos.isNotEmpty()) {
+                if (partidos.isNotEmpty()) {
                     _uiState.value = HomeUiState.Success(partidos)
+                } else if (_uiState.value is HomeUiState.Success) {
+                    _uiState.value = HomeUiState.Empty
                 }
             }
         }

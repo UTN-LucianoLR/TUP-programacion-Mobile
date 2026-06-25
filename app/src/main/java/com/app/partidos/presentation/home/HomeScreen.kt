@@ -1,6 +1,6 @@
 package com.app.partidos.presentation.home
 
-import androidx.compose.foundation.clickable
+// import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -12,15 +12,17 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.app.partidos.domain.model.Partido
+// import com.app.partidos.domain.model.Partido
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     onNavigateToDetail: (String) -> Unit,
     onNavigateToLogin: () -> Unit,
+    onNavigateToTickets: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -28,17 +30,28 @@ fun HomeScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Partidos del Mundial") },
+                title = { Text("Partidos del Mundial", color = Color.White) },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color(0xFF101F3D)
+                ),
                 actions = {
+                    TextButton(onClick = onNavigateToTickets) {
+                        Text("Mis Tickets", color = Color.White)
+                    }
                     IconButton(onClick = {
                         viewModel.logout()
                         onNavigateToLogin()
                     }) {
-                        Icon(imageVector = Icons.Default.ExitToApp, contentDescription = "Cerrar sesión")
+                        Icon(
+                            imageVector = Icons.Default.ExitToApp,
+                            contentDescription = "Cerrar sesión",
+                            tint = Color.White
+                        )
                     }
                 }
             )
-        }
+        },
+        containerColor = Color(0xFF101F3D)
     ) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
             Spacer(modifier = Modifier.height(8.dp))
@@ -46,12 +59,12 @@ fun HomeScreen(
         when (val state = uiState) {
             is HomeUiState.Loading -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
+                    CircularProgressIndicator(color = Color(0xFFE63946))
                 }
             }
             is HomeUiState.Empty -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("No hay partidos disponibles.")
+                    Text("No hay partidos disponibles.", color = Color.White)
                 }
             }
             is HomeUiState.Error -> {
@@ -69,20 +82,4 @@ fun HomeScreen(
         }
     }
 }
-}
-
-@Composable
-fun PartidoItem(partido: Partido, onClick: () -> Unit) {
-    Card(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp).clickable { onClick() }) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text("${partido.equipoLocal} vs ${partido.equipoVisitante}", style = MaterialTheme.typography.titleLarge)
-            Text("Estadio: ${partido.estadio}")
-            Text("Fecha: ${partido.fecha} - ${partido.hora}")
-            if (partido.disponible) {
-                Text("Entradas disponibles: ${partido.entradasDisponibles}", color = MaterialTheme.colorScheme.primary)
-            } else {
-                Text("Entradas Agotadas", color = MaterialTheme.colorScheme.error)
-            }
-        }
-    }
 }

@@ -1,32 +1,38 @@
 package com.app.partidos.data.repository
 
-import android.database.sqlite.SQLiteConstraintException
-import com.app.partidos.data.local.dao.UsuarioDao
-import com.app.partidos.data.local.entity.UsuarioEntity
+import com.app.partidos.data.local.preferences.AuthPreferences
+import com.app.partidos.data.remote.AuthApiService
+import com.app.partidos.data.remote.dto.LoginRequestDto
+import com.app.partidos.data.remote.dto.RegistroRequestDto
 import com.app.partidos.domain.model.Usuario
 import com.app.partidos.domain.repository.AuthRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
+import retrofit2.HttpException
+import java.io.IOException
 
 class AuthRepositoryImpl(
-    private val usuarioDao: UsuarioDao
+    private val authApiService: AuthApiService,
+    private val authPreferences: AuthPreferences
 ) : AuthRepository {
 
     override suspend fun registrarUsuario(
         nombre: String, apellido: String, email: String, passwordHash: String, telefono: String
     ): Result<Usuario> {
         return try {
-            val entity = UsuarioEntity(
-                nombre = nombre, // El UUID se genera solo en el id
-                email = email,
-                passwordHash = passwordHash,
-                estaLogueado = false
+            val response = authApiService.registrar(
+                RegistroRequestDto(nombre = nombre, apellido = apellido, email = email, password = passwordHash, confirmarPassword = passwordHash)
             )
-            usuarioDao.logoutTodos()
-            usuarioDao.insertUsuario(entity)
-            Result.success(entity.toDomain())
-        } catch (e: SQLiteConstraintException) {
-            Result.failure(Exception("El email ya está registrado."))
+            if (response.isSuccessful) {
+                Result.success(Usuario(id = "0", nombre = nombre, email = email, password = ""))
+            } else {
+                Result.failure(Exception("Error al registrar: ${response.code()}"))
+            }
+        } catch (e: HttpException) {
+            Result.failure(Exception("Error de red: ${e.message}"))
+        } catch (e: IOException) {
+            Result.failure(Exception("No se pudo conectar al servidor"))
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -34,31 +40,36 @@ class AuthRepositoryImpl(
 
     override suspend fun login(email: String, passwordHash: String): Result<Usuario> {
         return try {
-            val usuarioEntity = usuarioDao.getUsuarioByEmail(email)
-            if (usuarioEntity != null && usuarioEntity.passwordHash == passwordHash) {
-                usuarioDao.logoutTodos()
-                usuarioDao.updateUsuario(usuarioEntity.copy(estaLogueado = true))
-                Result.success(usuarioEntity.toDomain())
-            } else {
-                Result.failure(Exception("Credenciales incorrectas."))
-            }
+            val response = authApiService.login(
+                LoginRequestDto(email = email, password = passwordHash)
+            )
+            authPreferences.saveSession(response.token, response.id)
+            Result.success(Usuario(id = response.id.toString(), nombre = "Usuario", email = email, password = ""))
+        } catch (e: HttpException) {
+            Result.failure(Exception("Credenciales incorrectas o error de servidor"))
+        } catch (e: IOException) {
+            Result.failure(Exception("No se pudo conectar al servidor"))
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
 
-    override suspend fun logout() = usuarioDao.logoutTodos()
+    override suspend fun logout() {
+        authPreferences.clearSession()
+    }
 
-    override fun getUsuarioLogueadoFlow(): Flow<Usuario?> = usuarioDao.getUsuarioLogueadoFlow().map { it?.toDomain() }
+    override fun getUsuarioLogueadoFlow(): Flow<Usuario?> {
+        return authPreferences.userIdFlow.map { userId ->
+            if (userId != null) Usuario(id = userId.toString(), nombre = "User", email = "", password = "") else null
+        }
+    }
 
-    override suspend fun getUsuarioLogueado(): Usuario? = usuarioDao.getUsuarioLogueado()?.toDomain()
+    override suspend fun getUsuarioLogueado(): Usuario? {
+        val userId = authPreferences.userIdFlow.firstOrNull()
+        return if (userId != null) Usuario(id = userId.toString(), nombre = "User", email = "", password = "") else null
+    }
 
     override suspend fun recuperarPassword(email: String): Result<Unit> {
-        val usuario = usuarioDao.getUsuarioByEmail(email)
-        return if (usuario != null) {
-            Result.success(Unit) // Simulamos que el correo se envía correctamente
-        } else {
-            Result.failure(Exception("Email no encontrado en la base de datos local"))
-        }
+        return Result.failure(Exception("Not implemented yet"))
     }
 }

@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface UsuarioDao {
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun insertUsuario(usuario: UsuarioEntity) // Ya no devuelve Long porque el ID es String (UUID)
+    suspend fun insertUsuario(usuario: UsuarioEntity)
 
     @Update
     suspend fun updateUsuario(usuario: UsuarioEntity)
