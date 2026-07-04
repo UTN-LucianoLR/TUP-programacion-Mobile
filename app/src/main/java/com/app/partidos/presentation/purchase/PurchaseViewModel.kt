@@ -68,6 +68,13 @@ class PurchaseViewModel @Inject constructor(
         )
     }
 
+    fun onMetodoPagoChanged(metodo: String) {
+        _uiState.value = _uiState.value.copy(
+            metodoPago = metodo,
+            error = null
+        )
+    }
+
     fun validarYContinuar(onSuccess: (Pago) -> Unit) {
         val st   = _uiState.value
         val cant = st.cantidad.toIntOrNull() ?: 0
