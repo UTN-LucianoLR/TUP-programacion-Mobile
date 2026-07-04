@@ -3,8 +3,13 @@ package com.app.partidos.data.repository
 import com.app.partidos.data.local.dao.CompraDao
 import com.app.partidos.data.local.dao.PartidoDao
 import com.app.partidos.data.local.entity.CompraEntity
+import com.app.partidos.data.mapper.toDomain
+import com.app.partidos.data.mapper.toEntity
 import com.app.partidos.data.remote.PartidosApi
-import com.app.partidos.data.remote.dto.PaymentRequestDto
+import com.app.partidos.data.remote.dto.CompraResponseDto
+import com.app.partidos.data.remote.dto.CrearCompraDto
+import com.app.partidos.data.remote.dto.CrearPagoDto
+import com.app.partidos.data.remote.dto.CrearTicketDto
 import com.app.partidos.domain.model.Compra
 import com.app.partidos.domain.model.Pago
 import com.app.partidos.domain.model.Partido
@@ -23,21 +28,9 @@ class PartidosRepositoryImpl(
         return try {
             val count = partidoDao.countPartidos()
             if (count == 0 || forceRefresh) {
-                val matchesResponse = api.getMatches()
-                val teamsResponse = api.getTeams()
-                val stadiumsResponse = api.getStadiums()
-                // api.getTournaments() is available but not used for entities yet
+                val matchesResponse = api.getPartidos()
+                val entities = matchesResponse.map { it.toEntity() }
                 
-                val teamsMap = teamsResponse.teams.associateBy { it.idTeam }
-                val stadiumsMap = stadiumsResponse.stadiums.associateBy { it.idStadium }
-
-                val entities = matchesResponse.matches.map { matchDto ->
-                    val homeTeam = teamsMap[matchDto.homeTeamId]
-                    val awayTeam = teamsMap[matchDto.awayTeamId]
-                    val stadium = stadiumsMap[matchDto.stadiumId]
-                    
-                    matchDto.toEntity(homeTeam, awayTeam, stadium)
-                }
                 partidoDao.deleteAllPartidos()
                 partidoDao.insertPartidos(entities)
             }
@@ -57,34 +50,47 @@ class PartidosRepositoryImpl(
 
     override suspend fun procesarCompra(pago: Pago, usuarioId: String, partidoId: String, cantidad: Int): Result<Compra> {
         return try {
-            val request = PaymentRequestDto(
-                matchId = partidoId,
-                userId = usuarioId,
-                quantity = cantidad,
-                cardNumber = pago.numeroTarjeta,
-                cardHolder = pago.nombreTitular,
-                expiryDate = pago.vencimiento,
-                cvv = pago.cvv
+            val tickets = (1..cantidad).map {
+                CrearTicketDto(
+                    partidoId = partidoId.toInt(),
+                    sector = "General",
+                    fila = "A",
+                    asiento = java.util.UUID.randomUUID().toString().take(6),
+                    precio = pago.monto / cantidad
+                )
+            }
+
+            val request = CrearCompraDto(
+                usuarioId = usuarioId.toInt(),
+                pago = CrearPagoDto(
+                    metodoPago    = pago.metodoPago,
+                    monto         = pago.monto,
+                    numeroTarjeta = pago.numeroTarjeta,
+                    titular       = pago.nombreTitular,
+                    vencimiento   = pago.vencimiento,
+                    cvv           = pago.cvv
+                ),
+                tickets = tickets
             )
 
             val response = api.processPayment(request)
             
-            if (response.success && response.transactionId != null) {
+            if (response.id >= 0) {
                 val compraEntity = CompraEntity(
                     usuarioId = usuarioId,
                     partidoId = partidoId,
                     cantidadEntradas = cantidad,
-                    total = response.totalAmount,
-                    fechaCompra = response.purchaseDate ?: Instant.now().toString()
+                    total = response.total,
+                    fechaCompra = response.fecha
                 )
                 compraDao.insertCompra(compraEntity)
-                partidoDao.restarEntradas(partidoId, cantidad) // Descontar entradas
+                partidoDao.restarEntradas(partidoId, cantidad)
                 Result.success(compraEntity.toDomain())
             } else {
-                Result.failure(Exception(response.message))
+                Result.failure(Exception("La respuesta de la API no contiene un ID válido"))
             }
         } catch (e: Exception) {
-            Result.failure(Exception("Error procesando pago: ${e.message}"))
+            Result.failure(e)
         }
     }
 

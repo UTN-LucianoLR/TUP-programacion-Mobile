@@ -6,9 +6,9 @@ plugins {
     kotlin("plugin.compose")
     id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
+    alias(libs.plugins.kotlin.serialization)
 }
 
-// ── Lectura de local.properties con fallo elegante ───────────────────────────
 // Se usa rootProject.file() para que la ruta sea siempre relativa a la raíz
 // del proyecto, independientemente del sistema operativo o entorno de CI.
 val localProperties = Properties().also { props: Properties ->
@@ -31,11 +31,11 @@ val apiBaseUrl: String = localProperties.getProperty("API_BASE_URL")
 
 android {
     namespace  = "com.app.partidos"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId             = "com.app.partidos"
-        minSdk                    = 31
+        minSdk                    = 29
         targetSdk                 = 36
         versionCode               = 1
         versionName               = "1.0"
@@ -129,6 +129,9 @@ dependencies {
 
     // ── DataStore ─────────────────────────────────────────────────────────────
     implementation(libs.androidx.datastore.preferences)
+
+    // ── Serialization ─────────────────────────────────────────────────────────
+    implementation(libs.kotlinx.serialization.json)
 
     // ── Coil ──────────────────────────────────────────────────────────────────
     implementation(libs.coil.compose)

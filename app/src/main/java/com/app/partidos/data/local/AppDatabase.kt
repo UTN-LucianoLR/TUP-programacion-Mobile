@@ -11,7 +11,7 @@ import com.app.partidos.data.local.entity.UsuarioEntity
 
 @Database(
     entities = [UsuarioEntity::class, PartidoEntity::class, CompraEntity::class],
-    version = 4,
+    version = 5,
     exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {
