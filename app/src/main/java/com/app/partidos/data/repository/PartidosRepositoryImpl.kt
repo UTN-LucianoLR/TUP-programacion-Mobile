@@ -55,7 +55,7 @@ class PartidosRepositoryImpl(
                     partidoId = partidoId.toInt(),
                     sector = "General",
                     fila = "A",
-                    asiento = it.toString(),
+                    asiento = java.util.UUID.randomUUID().toString().take(6),
                     precio = pago.monto / cantidad
                 )
             }
@@ -75,7 +75,7 @@ class PartidosRepositoryImpl(
 
             val response = api.processPayment(request)
             
-            if (response.id > 0) {
+            if (response.id >= 0) {
                 val compraEntity = CompraEntity(
                     usuarioId = usuarioId,
                     partidoId = partidoId,

@@ -40,7 +40,7 @@ object AppModule {
             context,
             AppDatabase::class.java,
             "partidos_db"
-        ).fallbackToDestructiveMigration(dropAllTables = true).build()
+        ).fallbackToDestructiveMigration().build()
     }
 
     @Provides

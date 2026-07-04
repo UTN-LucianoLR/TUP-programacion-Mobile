@@ -15,6 +15,62 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.app.partidos.domain.model.Pago
 
 import com.app.partidos.presentation.validation.ValidationScreen
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.input.TransformedText
+import androidx.compose.ui.text.input.OffsetMapping
+import androidx.compose.ui.text.AnnotatedString
+
+class CardNumberVisualTransformation : VisualTransformation {
+    override fun filter(text: AnnotatedString): TransformedText {
+        val trimmed = if (text.text.length >= 16) text.text.substring(0..15) else text.text
+        var out = ""
+        for (i in trimmed.indices) {
+            out += trimmed[i]
+            if (i % 4 == 3 && i != 15) out += " "
+        }
+        val offsetTranslator = object : OffsetMapping {
+            override fun originalToTransformed(offset: Int): Int {
+                if (offset <= 3) return offset
+                if (offset <= 7) return offset + 1
+                if (offset <= 11) return offset + 2
+                if (offset <= 16) return offset + 3
+                return 19
+            }
+            override fun transformedToOriginal(offset: Int): Int {
+                if (offset <= 4) return offset
+                if (offset <= 9) return offset - 1
+                if (offset <= 14) return offset - 2
+                if (offset <= 19) return offset - 3
+                return 16
+            }
+        }
+        return TransformedText(AnnotatedString(out), offsetTranslator)
+    }
+}
+
+class ExpirationDateVisualTransformation : VisualTransformation {
+    override fun filter(text: AnnotatedString): TransformedText {
+        val trimmed = if (text.text.length >= 4) text.text.substring(0..3) else text.text
+        var out = ""
+        for (i in trimmed.indices) {
+            out += trimmed[i]
+            if (i == 1) out += "/"
+        }
+        val offsetTranslator = object : OffsetMapping {
+            override fun originalToTransformed(offset: Int): Int {
+                if (offset <= 1) return offset
+                if (offset <= 4) return offset + 1
+                return 5
+            }
+            override fun transformedToOriginal(offset: Int): Int {
+                if (offset <= 2) return offset
+                if (offset <= 5) return offset - 1
+                return 4
+            }
+        }
+        return TransformedText(AnnotatedString(out), offsetTranslator)
+    }
+}
 
 @Composable
 fun PurchaseScreen(
@@ -134,6 +190,7 @@ fun PurchaseScreen(
                         onValueChange = { viewModel.onTarjetaChanged(it) },
                         label = { Text("Número de Tarjeta") },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        visualTransformation = CardNumberVisualTransformation(),
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth(),
                         colors = textFieldColors
@@ -153,6 +210,8 @@ fun PurchaseScreen(
                             value = uiState.vencimiento,
                             onValueChange = { viewModel.onVencimientoChanged(it) },
                             label = { Text("Venc. (MM/AA)") },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            visualTransformation = ExpirationDateVisualTransformation(),
                             singleLine = true,
                             modifier = Modifier.weight(1f),
                             colors = textFieldColors

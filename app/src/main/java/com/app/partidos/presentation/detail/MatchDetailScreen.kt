@@ -62,6 +62,7 @@ fun MatchDetailScreen(
                 }
                 is MatchDetailUiState.Success -> {
                     val partido = state.partido
+                    val isPastMatch = state.isPastMatch
                     Text(
                         "Detalles del Partido",
                         style = MaterialTheme.typography.headlineMedium,
@@ -71,7 +72,7 @@ fun MatchDetailScreen(
 
                     Card(
                         modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(containerColor = Color(0xFFE63946)),
+                        colors = CardDefaults.cardColors(containerColor = if (isPastMatch) Color.Gray else Color(0xFFE63946)),
                         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
@@ -108,8 +109,8 @@ fun MatchDetailScreen(
                             Text("🕒 Hora: ${partido.hora}", color = Color.White)
                             Text("💲 Precio unitario: \$${partido.precio}", color = Color.White)
                             Text(
-                                text = if (partido.disponible) "🎟 Entradas disponibles: ${partido.entradasDisponibles}" else "❌ Agotado",
-                                color = if (partido.disponible) Color.White else Color.Yellow,
+                                text = if (isPastMatch) "🏁 Partido finalizado" else if (partido.disponible) "🎟 Entradas disponibles: ${partido.entradasDisponibles}" else "❌ Agotado",
+                                color = if (isPastMatch || partido.disponible) Color.White else Color.Yellow,
                                 modifier = Modifier.padding(top = 8.dp)
                             )
                         }
@@ -117,16 +118,18 @@ fun MatchDetailScreen(
 
                     Spacer(modifier = Modifier.weight(1f))
 
-                    Button(
-                        onClick = {
-                            if (isLoggedIn) onNavigateToPurchase(partido.id)
-                            else onNavigateToLogin()
-                        },
-                        enabled = partido.disponible,
-                        modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE63946))
-                    ) {
-                        Text("Comprar Entradas")
+                    if (!isPastMatch) {
+                        Button(
+                            onClick = {
+                                if (isLoggedIn) onNavigateToPurchase(partido.id)
+                                else onNavigateToLogin()
+                            },
+                            enabled = partido.disponible,
+                            modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE63946))
+                        ) {
+                            Text("Comprar Entradas")
+                        }
                     }
 
                     OutlinedButton(

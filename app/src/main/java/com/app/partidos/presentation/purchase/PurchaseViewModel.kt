@@ -47,10 +47,26 @@ class PurchaseViewModel @Inject constructor(
         )
     }
 
-    fun onTarjetaChanged(t: String) { _uiState.value = _uiState.value.copy(numeroTarjeta = t) }
+    fun onTarjetaChanged(t: String) { 
+        val digits = t.filter { it.isDigit() }.take(16)
+        _uiState.value = _uiState.value.copy(numeroTarjeta = digits) 
+    }
     fun onTitularChanged(t: String) { _uiState.value = _uiState.value.copy(nombreTitular = t) }
-    fun onVencimientoChanged(v: String) { _uiState.value = _uiState.value.copy(vencimiento = v) }
-    fun onCvvChanged(c: String) { _uiState.value = _uiState.value.copy(cvv = c) }
+    fun onVencimientoChanged(v: String) { 
+        val digits = v.filter { it.isDigit() }.take(4)
+        _uiState.value = _uiState.value.copy(vencimiento = digits) 
+    }
+    fun onCvvChanged(c: String) { 
+        val digits = c.filter { it.isDigit() }.take(4)
+        _uiState.value = _uiState.value.copy(cvv = digits) 
+    }
+
+    fun onMetodoPagoChanged(metodo: String) {
+        _uiState.value = _uiState.value.copy(
+            metodoPago = metodo,
+            error = null
+        )
+    }
 
     fun onMetodoPagoChanged(metodo: String) {
         _uiState.value = _uiState.value.copy(
@@ -81,11 +97,11 @@ class PurchaseViewModel @Inject constructor(
             return
         }
 
-        // Validaciones Regex para Tarjeta (mismas que en compra.js — Sección 3.7 del plan)
+        // Validaciones Regex para Tarjeta
         val regexTarjeta     = Regex("""^\d{16}$""")
         val regexCvv         = Regex("""^\d{3,4}$""")
         val regexTitular     = Regex("""^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$""")
-        val regexVencimiento = Regex("""^(0[1-9]|1[0-2])/\d{2}$""")
+        val regexVencimiento = Regex("""^(0[1-9]|1[0-2])\d{2}$""") // Solo 4 números MMYY
 
         if (!regexTarjeta.matches(st.numeroTarjeta)) {
             _uiState.value = st.copy(error = "El número de tarjeta debe tener exactamente 16 dígitos.")
@@ -96,7 +112,7 @@ class PurchaseViewModel @Inject constructor(
             return
         }
         if (!regexVencimiento.matches(st.vencimiento) || !esVencimientoFuturo(st.vencimiento)) {
-            _uiState.value = st.copy(error = "Ingresá un vencimiento válido y futuro (MM/AA).")
+            _uiState.value = st.copy(error = "Ingresá un vencimiento válido y futuro (MMAA).")
             return
         }
         if (!regexCvv.matches(st.cvv)) {
@@ -104,12 +120,19 @@ class PurchaseViewModel @Inject constructor(
             return
         }
 
+        // Formatear el vencimiento a MM/YY para la API si tiene 4 dígitos
+        val vencimientoFormateado = if (st.vencimiento.length == 4) {
+            "${st.vencimiento.substring(0, 2)}/${st.vencimiento.substring(2, 4)}"
+        } else {
+            st.vencimiento
+        }
+
         val pago = Pago(
             metodoPago    = "Tarjeta",
             monto         = st.totalCalculado,
             numeroTarjeta = st.numeroTarjeta,
             nombreTitular = st.nombreTitular,
-            vencimiento   = st.vencimiento,
+            vencimiento   = vencimientoFormateado,
             cvv           = st.cvv
         )
         _uiState.value = st.copy(error = null)
@@ -118,9 +141,9 @@ class PurchaseViewModel @Inject constructor(
 
     private fun esVencimientoFuturo(vencimiento: String): Boolean {
         return try {
-            val partes     = vencimiento.split("/")
-            val mes        = partes[0].toInt()
-            val anio       = 2000 + partes[1].toInt()
+            if (vencimiento.length != 4) return false
+            val mes        = vencimiento.substring(0, 2).toInt()
+            val anio       = 2000 + vencimiento.substring(2, 4).toInt()
             val ahora      = java.util.Calendar.getInstance()
             val anioActual = ahora.get(java.util.Calendar.YEAR)
             val mesActual  = ahora.get(java.util.Calendar.MONTH) + 1

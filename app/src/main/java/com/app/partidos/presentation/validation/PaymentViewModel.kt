@@ -52,17 +52,40 @@ class PaymentViewModel @Inject constructor(
                 _uiState.value = PaymentUiState.Approved(compra)
             }.onFailure { error ->
                 if (error is retrofit2.HttpException) {
-                    val errorBody = error.response()?.errorBody()?.string()
+                    val errorBody = error.response()?.errorBody()?.string() ?: ""
                     val mensaje = try {
-                        org.json.JSONObject(errorBody ?: "{}").getString("mensaje")
+                        val json = org.json.JSONObject(errorBody)
+                        when {
+                            json.has("mensaje") -> json.getString("mensaje")
+                            json.has("message") -> json.getString("message")
+                            json.has("errors") -> {
+                                val errors = json.getJSONObject("errors")
+                                val keys = errors.keys()
+                                if (keys.hasNext()) {
+                                    errors.getJSONArray(keys.next()).getString(0)
+                                } else if (json.has("title")) {
+                                    json.getString("title")
+                                } else {
+                                    "Error de validación en el servidor."
+                                }
+                            }
+                            json.has("title") -> json.getString("title")
+                            else -> "Error ${error.code()}: ${error.message()}"
+                        }
                     } catch (_: Exception) {
-                        "Error al procesar el pago."
+                        // El body no es JSON (HTML, texto plano)
+                        if (errorBody.isNotBlank() && !errorBody.trimStart().startsWith("<")) {
+                            errorBody.take(200)
+                        } else {
+                            "Error ${error.code()} al procesar el pago. Verificá tu conexión con el servidor."
+                        }
                     }
                     _uiState.value = PaymentUiState.Rejected(message = mensaje)
                 } else if (error is java.io.IOException) {
                     _uiState.value = PaymentUiState.Rejected(message = "Sin conexión. Verificá tu red e intentá nuevamente.")
                 } else {
-                    _uiState.value = PaymentUiState.Rejected(error.message ?: "Pago rechazado")
+                    val msg = error.message ?: "Error desconocido"
+                    _uiState.value = PaymentUiState.Rejected("Pago rechazado: $msg")
                 }
             }
         }

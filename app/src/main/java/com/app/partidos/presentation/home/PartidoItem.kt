@@ -15,13 +15,13 @@ import androidx.compose.ui.unit.dp
 import com.app.partidos.domain.model.Partido
 
 @Composable
-fun PartidoItem(partido: Partido, onClick: () -> Unit) {
+fun PartidoItem(partido: Partido, isPast: Boolean = false, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 8.dp, vertical = 6.dp)
             .clickable { onClick() },
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFE63946)),
+        colors = CardDefaults.cardColors(containerColor = if (isPast) Color.Gray else Color(0xFFE63946)),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {

@@ -26,6 +26,8 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val searchText by viewModel.searchText.collectAsState()
+    val showPastMatches by viewModel.showPastMatches.collectAsState()
 
     Scaffold(
         topBar = {
@@ -54,7 +56,48 @@ fun HomeScreen(
         containerColor = Color(0xFF101F3D)
     ) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
-            Spacer(modifier = Modifier.height(8.dp))
+            
+            OutlinedTextField(
+                value = searchText,
+                onValueChange = { viewModel.onSearchTextChange(it) },
+                placeholder = { Text("Buscar equipo, estadio o fecha...") },
+                singleLine = true,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White,
+                    focusedBorderColor = Color.White,
+                    unfocusedBorderColor = Color.LightGray,
+                    focusedPlaceholderColor = Color.LightGray,
+                    unfocusedPlaceholderColor = Color.LightGray,
+                    cursorColor = Color.White
+                )
+            )
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Mostrar partidos jugados",
+                    color = Color.White,
+                    modifier = Modifier.weight(1f)
+                )
+                Switch(
+                    checked = showPastMatches,
+                    onCheckedChange = { viewModel.onTogglePastMatches(it) },
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = Color.White,
+                        checkedTrackColor = Color(0xFFE63946)
+                    )
+                )
+            }
+
+            Spacer(modifier = Modifier.height(4.dp))
 
         when (val state = uiState) {
             is HomeUiState.Loading -> {
@@ -75,7 +118,11 @@ fun HomeScreen(
             is HomeUiState.Success -> {
                 LazyColumn(modifier = Modifier.fillMaxSize()) {
                     items(state.partidos) { partido ->
-                        PartidoItem(partido = partido, onClick = { onNavigateToDetail(partido.id) })
+                        PartidoItem(
+                            partido = partido,
+                            isPast = showPastMatches,
+                            onClick = { onNavigateToDetail(partido.id) }
+                        )
                     }
                 }
             }
