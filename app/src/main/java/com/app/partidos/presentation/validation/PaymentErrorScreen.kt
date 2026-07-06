@@ -7,6 +7,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.app.partidos.R
 
 @Composable
 fun PaymentErrorScreen(
@@ -24,7 +26,7 @@ fun PaymentErrorScreen(
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                "❌ Pago Rechazado",
+                stringResource(R.string.validation_payment_rejected),
                 style = MaterialTheme.typography.headlineLarge,
                 color = Color.Yellow
             )
@@ -49,13 +51,13 @@ fun PaymentErrorScreen(
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE63946))
             ) {
-                Text("Reintentar Pago")
+                Text(stringResource(R.string.validation_retry_payment))
             }
             OutlinedButton(
                 onClick = onCancel,
                 modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
             ) {
-                Text("Cancelar Compra", color = Color.White)
+                Text(stringResource(R.string.validation_cancel_purchase), color = Color.White)
             }
         }
     }

@@ -13,6 +13,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.app.partidos.domain.model.Pago
+import androidx.compose.ui.res.stringResource
+import com.app.partidos.R
 
 import com.app.partidos.presentation.validation.ValidationScreen
 import androidx.compose.ui.text.input.VisualTransformation
@@ -20,57 +22,7 @@ import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.AnnotatedString
 
-class CardNumberVisualTransformation : VisualTransformation {
-    override fun filter(text: AnnotatedString): TransformedText {
-        val trimmed = if (text.text.length >= 16) text.text.substring(0..15) else text.text
-        var out = ""
-        for (i in trimmed.indices) {
-            out += trimmed[i]
-            if (i % 4 == 3 && i != 15) out += " "
-        }
-        val offsetTranslator = object : OffsetMapping {
-            override fun originalToTransformed(offset: Int): Int {
-                if (offset <= 3) return offset
-                if (offset <= 7) return offset + 1
-                if (offset <= 11) return offset + 2
-                if (offset <= 16) return offset + 3
-                return 19
-            }
-            override fun transformedToOriginal(offset: Int): Int {
-                if (offset <= 4) return offset
-                if (offset <= 9) return offset - 1
-                if (offset <= 14) return offset - 2
-                if (offset <= 19) return offset - 3
-                return 16
-            }
-        }
-        return TransformedText(AnnotatedString(out), offsetTranslator)
-    }
-}
 
-class ExpirationDateVisualTransformation : VisualTransformation {
-    override fun filter(text: AnnotatedString): TransformedText {
-        val trimmed = if (text.text.length >= 4) text.text.substring(0..3) else text.text
-        var out = ""
-        for (i in trimmed.indices) {
-            out += trimmed[i]
-            if (i == 1) out += "/"
-        }
-        val offsetTranslator = object : OffsetMapping {
-            override fun originalToTransformed(offset: Int): Int {
-                if (offset <= 1) return offset
-                if (offset <= 4) return offset + 1
-                return 5
-            }
-            override fun transformedToOriginal(offset: Int): Int {
-                if (offset <= 2) return offset
-                if (offset <= 5) return offset - 1
-                return 4
-            }
-        }
-        return TransformedText(AnnotatedString(out), offsetTranslator)
-    }
-}
 
 @Composable
 fun PurchaseScreen(
@@ -112,12 +64,12 @@ fun PurchaseScreen(
                     CircularProgressIndicator(color = Color(0xFFE63946))
                 }
             } else if (uiState.error != null && uiState.partido == null) {
-                Text("Error: ${uiState.error}", color = MaterialTheme.colorScheme.error)
+                Text(stringResource(R.string.error_message, uiState.error!!), color = MaterialTheme.colorScheme.error)
                 Button(
                     onClick = onNavigateBack,
                     modifier = Modifier.padding(top = 16.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE63946))
-                ) { Text("Volver") }
+                ) { Text(stringResource(R.string.back_button)) }
             } else if (uiState.partido != null) {
                 Text(
                     "Comprar Entradas",
@@ -138,7 +90,7 @@ fun PurchaseScreen(
                 OutlinedTextField(
                     value = uiState.cantidad,
                     onValueChange = { viewModel.onCantidadChanged(it) },
-                    label = { Text("Cantidad de Entradas") },
+                    label = { Text(stringResource(R.string.purchase_ticket_quantity)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
@@ -154,7 +106,7 @@ fun PurchaseScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Selector de método de pago
-                Text("Método de pago", style = MaterialTheme.typography.titleSmall, color = Color.White)
+                Text(stringResource(R.string.purchase_payment_method), style = MaterialTheme.typography.titleSmall, color = Color.White)
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(modifier = Modifier.fillMaxWidth()) {
                     listOf("Tarjeta", "Transferencia").forEach { metodo ->
@@ -185,75 +137,21 @@ fun PurchaseScreen(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 if (uiState.metodoPago == "Tarjeta") {
-                    OutlinedTextField(
-                        value = uiState.numeroTarjeta,
-                        onValueChange = { viewModel.onTarjetaChanged(it) },
-                        label = { Text("Número de Tarjeta") },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        visualTransformation = CardNumberVisualTransformation(),
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = textFieldColors
+                    CreditCardForm(
+                        numeroTarjeta = uiState.numeroTarjeta,
+                        onTarjetaChanged = { viewModel.onTarjetaChanged(it) },
+                        nombreTitular = uiState.nombreTitular,
+                        onTitularChanged = { viewModel.onTitularChanged(it) },
+                        vencimiento = uiState.vencimiento,
+                        onVencimientoChanged = { viewModel.onVencimientoChanged(it) },
+                        cvv = uiState.cvv,
+                        onCvvChanged = { viewModel.onCvvChanged(it) },
+                        textFieldColors = textFieldColors
                     )
-
-                    OutlinedTextField(
-                        value = uiState.nombreTitular,
-                        onValueChange = { viewModel.onTitularChanged(it) },
-                        label = { Text("Nombre del Titular") },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = textFieldColors
-                    )
-
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        OutlinedTextField(
-                            value = uiState.vencimiento,
-                            onValueChange = { viewModel.onVencimientoChanged(it) },
-                            label = { Text("Venc. (MM/AA)") },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            visualTransformation = ExpirationDateVisualTransformation(),
-                            singleLine = true,
-                            modifier = Modifier.weight(1f),
-                            colors = textFieldColors
-                        )
-                        OutlinedTextField(
-                            value = uiState.cvv,
-                            onValueChange = { viewModel.onCvvChanged(it) },
-                            label = { Text("CVV") },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            singleLine = true,
-                            modifier = Modifier.weight(1f),
-                            colors = textFieldColors
-                        )
-                    }
                 }
 
                 if (uiState.metodoPago == "Transferencia") {
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.secondaryContainer
-                        )
-                    ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            Text(
-                                text  = "Datos para la transferencia",
-                                style = MaterialTheme.typography.titleSmall
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text("CBU: 0000003100012345678901")
-                            Text("Alias: MUNDIAL.TUP.2026")
-                            Text("Titular: TUP Mundial S.A.")
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(
-                                text  = "Tu compra quedará en estado Pendiente hasta que se confirme la acreditación.",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSecondaryContainer
-                            )
-                        }
-                    }
+                    TransferInfoCard()
                 }
 
                 if (uiState.error != null) {
@@ -271,11 +169,11 @@ fun PurchaseScreen(
                     modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE63946))
                 ) {
-                    Text("Confirmar Datos y Pagar")
+                    Text(stringResource(R.string.purchase_confirm))
                 }
 
                 OutlinedButton(onClick = onNavigateBack, modifier = Modifier.fillMaxWidth()) {
-                    Text("Cancelar", color = Color.White)
+                    Text(stringResource(R.string.purchase_cancel), color = Color.White)
                 }
             }
         }

@@ -13,11 +13,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-sealed interface TicketsUiState {
-    object Loading : TicketsUiState
-    data class Success(val tickets: List<Compra>) : TicketsUiState
-    data class Error(val message: String) : TicketsUiState
-}
 
 @HiltViewModel
 class TicketsViewModel @Inject constructor(

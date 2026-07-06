@@ -19,13 +19,14 @@ class RegisterViewModel @Inject constructor(
     val uiState: StateFlow<RegisterUiState> = _uiState.asStateFlow()
 
     fun onNombreChanged(nombre: String) { _uiState.value = _uiState.value.copy(nombre = nombre) }
+    fun onApellidoChanged(apellido: String) { _uiState.value = _uiState.value.copy(apellido = apellido) }
     fun onEmailChanged(email: String) { _uiState.value = _uiState.value.copy(email = email) }
     fun onPasswordChanged(password: String) { _uiState.value = _uiState.value.copy(password = password) }
     fun onConfirmarPasswordChanged(confirmarPassword: String) { _uiState.value = _uiState.value.copy(confirmarPassword = confirmarPassword) }
 
     fun registrar() {
         val st = _uiState.value
-        if (st.nombre.isBlank() || st.email.isBlank() || st.password.isBlank() || st.confirmarPassword.isBlank()) {
+        if (st.nombre.isBlank() || st.apellido.isBlank() || st.email.isBlank() || st.password.isBlank() || st.confirmarPassword.isBlank()) {
             _uiState.value = st.copy(error = "Complete todos los campos")
             return
         }
@@ -43,7 +44,7 @@ class RegisterViewModel @Inject constructor(
         }
         _uiState.value = st.copy(isLoading = true, error = null)
         viewModelScope.launch {
-            val result = authRepository.registrarUsuario(st.nombre, "", st.email, st.password, "")
+            val result = authRepository.registrarUsuario(st.nombre, st.apellido, st.email, st.password, "")
             result.onSuccess {
                 _uiState.value = _uiState.value.copy(isLoading = false, isSuccess = true)
             }.onFailure {
@@ -53,12 +54,3 @@ class RegisterViewModel @Inject constructor(
     }
 }
 
-data class RegisterUiState(
-    val nombre: String = "",
-    val email: String = "",
-    val password: String = "",
-    val confirmarPassword: String = "",
-    val isLoading: Boolean = false,
-    val error: String? = null,
-    val isSuccess: Boolean = false
-)

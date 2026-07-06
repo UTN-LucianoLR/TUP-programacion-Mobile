@@ -14,6 +14,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.ui.res.stringResource
+import com.app.partidos.R
 
 @Composable
 fun RegisterScreen(
@@ -28,7 +30,7 @@ fun RegisterScreen(
 
     LaunchedEffect(uiState.isSuccess) {
         if (uiState.isSuccess) {
-            Toast.makeText(context, "Cuenta creada exitosamente. Por favor, iniciá sesión.", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, context.getString(R.string.register_success), Toast.LENGTH_LONG).show()
             onNavigateBack()
         }
     }
@@ -39,7 +41,7 @@ fun RegisterScreen(
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                "Crear Cuenta",
+                stringResource(R.string.login_create_account),
                 style = MaterialTheme.typography.headlineMedium,
                 color = Color.White
             )
@@ -58,24 +60,44 @@ fun RegisterScreen(
 
             OutlinedTextField(
                 value = uiState.nombre,
-                onValueChange = { viewModel.onNombreChanged(it) },
-                label = { Text("Nombre") },
+                onValueChange = { 
+                    val text = it.replace("\n", "")
+                    if (text.length <= 45) viewModel.onNombreChanged(text) 
+                },
+                label = { Text(stringResource(R.string.register_name)) },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+                colors = textFieldColors
+            )
+            OutlinedTextField(
+                value = uiState.apellido,
+                onValueChange = { 
+                    val text = it.replace("\n", "")
+                    if (text.length <= 45) viewModel.onApellidoChanged(text) 
+                },
+                label = { Text(stringResource(R.string.recovery_last_name)) },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
                 colors = textFieldColors
             )
             OutlinedTextField(
                 value = uiState.email,
-                onValueChange = { viewModel.onEmailChanged(it) },
-                label = { Text("Email") },
+                onValueChange = { 
+                    val text = it.replace("\n", "")
+                    if (text.length <= 45) viewModel.onEmailChanged(text) 
+                },
+                label = { Text(stringResource(R.string.register_email)) },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
                 colors = textFieldColors
             )
             OutlinedTextField(
                 value = uiState.password,
-                onValueChange = { viewModel.onPasswordChanged(it) },
-                label = { Text("Contraseña") },
+                onValueChange = { 
+                    val text = it.replace("\n", "")
+                    if (text.length <= 15) viewModel.onPasswordChanged(text) 
+                },
+                label = { Text(stringResource(R.string.register_password)) },
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 trailingIcon = {
                     val icon = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff
@@ -89,8 +111,11 @@ fun RegisterScreen(
             )
             OutlinedTextField(
                 value = uiState.confirmarPassword,
-                onValueChange = { viewModel.onConfirmarPasswordChanged(it) },
-                label = { Text("Confirmar Contraseña") },
+                onValueChange = { 
+                    val text = it.replace("\n", "")
+                    if (text.length <= 15) viewModel.onConfirmarPasswordChanged(text) 
+                },
+                label = { Text(stringResource(R.string.register_confirm_password)) },
                 visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 trailingIcon = {
                     val icon = if (confirmPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff
@@ -113,11 +138,11 @@ fun RegisterScreen(
                 modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE63946))
             ) {
-                Text("Registrarse")
+                Text(stringResource(R.string.register_button))
             }
 
             TextButton(onClick = onNavigateBack) {
-                Text("Volver al Login", color = Color.White)
+                Text(stringResource(R.string.back_to_login), color = Color.White)
             }
         }
     }

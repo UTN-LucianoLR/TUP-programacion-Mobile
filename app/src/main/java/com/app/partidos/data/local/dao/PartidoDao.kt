@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+
 import com.app.partidos.data.local.entity.PartidoEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -14,6 +15,22 @@ interface PartidoDao {
 
     @Query("SELECT * FROM partidos ORDER BY dateIso ASC")
     fun getPartidosFlow(): Flow<List<PartidoEntity>>
+
+    @Query("""
+        SELECT * FROM partidos 
+        WHERE (equipoLocal LIKE '%' || :query || '%' OR equipoVisitante LIKE '%' || :query || '%' OR estadio LIKE '%' || :query || '%')
+        AND dateIso <= :nowIso
+        ORDER BY dateIso DESC
+    """)
+    fun getPastPartidosFlow(query: String, nowIso: String): Flow<List<PartidoEntity>>
+
+    @Query("""
+        SELECT * FROM partidos 
+        WHERE (equipoLocal LIKE '%' || :query || '%' OR equipoVisitante LIKE '%' || :query || '%' OR estadio LIKE '%' || :query || '%')
+        AND dateIso > :nowIso
+        ORDER BY dateIso ASC
+    """)
+    fun getUpcomingPartidosFlow(query: String, nowIso: String): Flow<List<PartidoEntity>>
 
     @Query("SELECT * FROM partidos WHERE id = :partidoId LIMIT 1")
     suspend fun getPartidoById(partidoId: String): PartidoEntity?

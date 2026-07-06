@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.Icons
@@ -71,7 +72,7 @@ fun LoginScreen(
                 OutlinedTextField(
                     value = uiState.email,
                     onValueChange = { if (it.length <= 45) viewModel.onEmailChanged(it) },
-                    label = { Text("Email") },
+                    label = { Text(stringResource(R.string.login_email)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                     colors = OutlinedTextFieldDefaults.colors(
@@ -88,7 +89,7 @@ fun LoginScreen(
                 OutlinedTextField(
                     value = uiState.password,
                     onValueChange = { if (it.length <= 15) viewModel.onPasswordChanged(it) },
-                    label = { Text("Contraseña") },
+                    label = { Text(stringResource(R.string.login_password)) },
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
                         val icon = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff
@@ -122,14 +123,14 @@ fun LoginScreen(
                         .height(55.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE63946))
                 ) {
-                    Text("INGRESAR")
+                    Text(stringResource(R.string.login_enter))
                 }
 
                 TextButton(onClick = onNavigateToRegister) {
-                    Text("Crear Cuenta", color = Color.White)
+                    Text(stringResource(R.string.login_create_account), color = Color.White)
                 }
                 TextButton(onClick = onNavigateToRecovery) {
-                    Text("Recuperar Contraseña", color = Color.White)
+                    Text(stringResource(R.string.login_recover_password), color = Color.White)
                 }
             }
         }

@@ -69,7 +69,27 @@ class AuthRepositoryImpl(
         return if (userId != null) Usuario(id = userId.toString(), nombre = "User", email = "", password = "") else null
     }
 
-    override suspend fun recuperarPassword(email: String): Result<Unit> {
-        return Result.failure(Exception("Not implemented yet"))
+    override suspend fun recuperarPassword(email: String, nombre: String, apellido: String, nuevaPassword: String): Result<Unit> {
+        return try {
+            val response = authApiService.recuperarPassword(
+                com.app.partidos.data.remote.dto.RecuperarPasswordDto(
+                    email = email,
+                    nombre = nombre,
+                    apellido = apellido,
+                    nuevaPassword = nuevaPassword
+                )
+            )
+            if (response.isSuccessful) {
+                Result.success(Unit)
+            } else {
+                Result.failure(Exception("Error al recuperar contraseña. Verifique los datos."))
+            }
+        } catch (e: HttpException) {
+            Result.failure(Exception("Error de red: ${e.message}"))
+        } catch (e: IOException) {
+            Result.failure(Exception("No se pudo conectar al servidor"))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 }

@@ -6,5 +6,8 @@ data class Compra(
     val partidoId: String,
     val cantidadEntradas: Int,
     val total: Double,
-    val fechaCompra: String
+    val fechaCompra: String,
+    val equipoLocal: String = "",
+    val equipoVisitante: String = "",
+    val fechaPartido: String = ""
 )

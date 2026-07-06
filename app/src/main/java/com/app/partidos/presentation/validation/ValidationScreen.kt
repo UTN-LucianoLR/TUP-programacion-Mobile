@@ -12,6 +12,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.app.partidos.domain.model.Pago
+import androidx.compose.ui.res.stringResource
+import com.app.partidos.R
 
 @Composable
 fun ValidationScreen(
@@ -40,7 +42,7 @@ fun ValidationScreen(
                         CircularProgressIndicator(color = Color(0xFFE63946))
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            "Procesando pago seguro...",
+                            stringResource(R.string.validation_processing),
                             style = MaterialTheme.typography.titleMedium,
                             color = Color.White
                         )

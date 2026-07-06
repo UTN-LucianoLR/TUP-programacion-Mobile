@@ -7,15 +7,18 @@ import com.app.partidos.data.local.dao.PartidoDao
 import com.app.partidos.data.local.dao.UsuarioDao
 import com.app.partidos.data.local.entity.CompraEntity
 import com.app.partidos.data.local.entity.PartidoEntity
+import com.app.partidos.data.local.dao.RemoteKeyDao
+import com.app.partidos.data.local.entity.PartidoRemoteKeyEntity
 import com.app.partidos.data.local.entity.UsuarioEntity
 
 @Database(
-    entities = [UsuarioEntity::class, PartidoEntity::class, CompraEntity::class],
-    version = 5,
+    entities = [UsuarioEntity::class, PartidoEntity::class, CompraEntity::class, PartidoRemoteKeyEntity::class],
+    version = 6,
     exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun usuarioDao(): UsuarioDao
     abstract fun partidoDao(): PartidoDao
     abstract fun compraDao(): CompraDao
+    abstract fun remoteKeyDao(): RemoteKeyDao
 }

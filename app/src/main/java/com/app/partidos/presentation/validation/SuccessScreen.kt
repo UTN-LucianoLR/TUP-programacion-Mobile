@@ -11,6 +11,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.app.partidos.R
 import com.app.partidos.domain.model.Compra
+import androidx.compose.ui.res.stringResource
 
 @Composable
 fun SuccessScreen(
@@ -43,7 +44,7 @@ fun SuccessScreen(
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    "¡Compra Exitosa!",
+                    stringResource(R.string.validation_purchase_success),
                     style = MaterialTheme.typography.headlineLarge,
                     color = Color.Yellow
                 )
@@ -58,10 +59,10 @@ fun SuccessScreen(
                         modifier = Modifier.padding(16.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text("ID Transacción: ${compra.id}", color = Color.White)
+                        Text(stringResource(R.string.validation_transaction_id, compra.id), color = Color.White)
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            "Total abonado: \$${compra.total}",
+                            stringResource(R.string.validation_total_paid, compra.total.toString()),
                             style = MaterialTheme.typography.titleMedium,
                             color = Color.White
                         )
@@ -74,7 +75,7 @@ fun SuccessScreen(
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE63946))
                 ) {
-                    Text("Volver al Inicio")
+                    Text(stringResource(R.string.validation_back_to_home))
                 }
             }
         }
