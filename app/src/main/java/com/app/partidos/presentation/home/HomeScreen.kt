@@ -1,11 +1,10 @@
 package com.app.partidos.presentation.home
 
-// import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -15,7 +14,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-// import com.app.partidos.domain.model.Partido
+import androidx.compose.ui.res.stringResource
+import com.app.partidos.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -25,28 +25,28 @@ fun HomeScreen(
     onNavigateToTickets: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val partidos by viewModel.partidosFlow.collectAsState(initial = emptyList())
     val searchText by viewModel.searchText.collectAsState()
     val showPastMatches by viewModel.showPastMatches.collectAsState()
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Partidos del Mundial", color = Color.White) },
+                title = { Text(stringResource(R.string.home_title), color = Color.White) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color(0xFF101F3D)
                 ),
                 actions = {
                     TextButton(onClick = onNavigateToTickets) {
-                        Text("Mis Tickets", color = Color.White)
+                        Text(stringResource(R.string.home_my_tickets), color = Color.White)
                     }
                     IconButton(onClick = {
                         viewModel.logout()
                         onNavigateToLogin()
                     }) {
                         Icon(
-                            imageVector = Icons.Default.ExitToApp,
-                            contentDescription = "Cerrar sesión",
+                            imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                            contentDescription = stringResource(R.string.home_logout),
                             tint = Color.White
                         )
                     }
@@ -60,7 +60,7 @@ fun HomeScreen(
             OutlinedTextField(
                 value = searchText,
                 onValueChange = { viewModel.onSearchTextChange(it) },
-                placeholder = { Text("Buscar equipo, estadio o fecha...") },
+                placeholder = { Text(stringResource(R.string.home_search_placeholder)) },
                 singleLine = true,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -83,7 +83,7 @@ fun HomeScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Mostrar partidos jugados",
+                    text = stringResource(R.string.home_show_past_matches),
                     color = Color.White,
                     modifier = Modifier.weight(1f)
                 )
@@ -99,34 +99,28 @@ fun HomeScreen(
 
             Spacer(modifier = Modifier.height(4.dp))
 
-        when (val state = uiState) {
-            is HomeUiState.Loading -> {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = Color(0xFFE63946))
-                }
-            }
-            is HomeUiState.Empty -> {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("No hay partidos disponibles.", color = Color.White)
-                }
-            }
-            is HomeUiState.Error -> {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("Error: ${state.message}", color = MaterialTheme.colorScheme.error)
-                }
-            }
-            is HomeUiState.Success -> {
-                LazyColumn(modifier = Modifier.fillMaxSize()) {
-                    items(state.partidos) { partido ->
-                        PartidoItem(
-                            partido = partido,
-                            isPast = showPastMatches,
-                            onClick = { onNavigateToDetail(partido.id) }
-                        )
+            Box(modifier = Modifier.fillMaxSize()) {
+                if (partidos.isEmpty()) {
+                    Text(
+                        text = stringResource(R.string.home_no_matches),
+                        color = Color.White,
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                } else {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(bottom = 16.dp)
+                    ) {
+                        items(partidos) { partido ->
+                            PartidoItem(
+                                partido = partido,
+                                isPast = showPastMatches,
+                                onClick = { onNavigateToDetail(partido.id) }
+                            )
+                        }
                     }
                 }
             }
-        }
     }
 }
 }

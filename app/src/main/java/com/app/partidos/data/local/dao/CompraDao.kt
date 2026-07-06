@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import com.app.partidos.data.local.entity.CompraEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -12,8 +13,9 @@ interface CompraDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCompra(compra: CompraEntity)
 
+    @Transaction
     @Query("SELECT * FROM compras WHERE usuarioId = :usuarioId ORDER BY fechaCompra DESC")
-    fun getComprasByUsuarioFlow(usuarioId: String): Flow<List<CompraEntity>>
+    fun getComprasByUsuarioFlow(usuarioId: String): Flow<List<com.app.partidos.data.local.entity.CompraConPartido>>
 
     @Query("SELECT * FROM compras WHERE id = :compraId LIMIT 1")
     suspend fun getCompraById(compraId: String): CompraEntity?

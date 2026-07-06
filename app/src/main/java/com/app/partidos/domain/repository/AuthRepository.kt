@@ -18,5 +18,5 @@ interface AuthRepository {
     
     suspend fun getUsuarioLogueado(): Usuario?
 
-    suspend fun recuperarPassword(email: String): Result<Unit>
+    suspend fun recuperarPassword(email: String, nombre: String, apellido: String, nuevaPassword: String): Result<Unit>
 }

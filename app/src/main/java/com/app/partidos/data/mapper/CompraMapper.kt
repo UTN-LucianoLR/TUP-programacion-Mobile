@@ -11,3 +11,15 @@ fun CompraEntity.toDomain(): Compra = Compra(
     total = total,
     fechaCompra = fechaCompra
 )
+
+fun com.app.partidos.data.local.entity.CompraConPartido.toDomain(): Compra = Compra(
+    id = compra.id,
+    usuarioId = compra.usuarioId,
+    partidoId = compra.partidoId,
+    cantidadEntradas = compra.cantidadEntradas,
+    total = compra.total,
+    fechaCompra = compra.fechaCompra,
+    equipoLocal = partido?.equipoLocal ?: "",
+    equipoVisitante = partido?.equipoVisitante ?: "",
+    fechaPartido = partido?.fecha ?: ""
+)

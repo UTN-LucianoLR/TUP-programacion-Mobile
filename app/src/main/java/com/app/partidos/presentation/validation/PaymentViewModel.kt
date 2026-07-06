@@ -13,12 +13,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-sealed interface PaymentUiState {
-    object Idle : PaymentUiState
-    object Processing : PaymentUiState
-    data class Approved(val compra: Compra) : PaymentUiState
-    data class Rejected(val message: String) : PaymentUiState
-}
 
 @HiltViewModel
 class PaymentViewModel @Inject constructor(

@@ -1,12 +1,13 @@
 package com.app.partidos.data.repository
 
-import com.app.partidos.data.local.dao.CompraDao
-import com.app.partidos.data.local.dao.PartidoDao
+import androidx.room.withTransaction
+
+
+import com.app.partidos.data.local.AppDatabase
 import com.app.partidos.data.local.entity.CompraEntity
+import com.app.partidos.data.local.entity.PartidoEntity
 import com.app.partidos.data.mapper.toDomain
-import com.app.partidos.data.mapper.toEntity
 import com.app.partidos.data.remote.PartidosApi
-import com.app.partidos.data.remote.dto.CompraResponseDto
 import com.app.partidos.data.remote.dto.CrearCompraDto
 import com.app.partidos.data.remote.dto.CrearPagoDto
 import com.app.partidos.data.remote.dto.CrearTicketDto
@@ -17,20 +18,36 @@ import com.app.partidos.domain.repository.PartidosRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 class PartidosRepositoryImpl(
     private val api: PartidosApi,
-    private val partidoDao: PartidoDao,
-    private val compraDao: CompraDao
+    private val db: AppDatabase
 ) : PartidosRepository {
 
-    override suspend fun getPartidos(forceRefresh: Boolean): Result<Unit> {
+    private val partidoDao = db.partidoDao()
+    private val compraDao = db.compraDao()
+
+    override suspend fun refreshPartidos(): Result<Unit> {
         return try {
-            val count = partidoDao.countPartidos()
-            if (count == 0 || forceRefresh) {
-                val matchesResponse = api.getPartidos()
-                val entities = matchesResponse.map { it.toEntity() }
-                
+            val partidosDto = api.getPartidos()
+            val entities = partidosDto.map {
+                PartidoEntity(
+                    id = it.id.toString(),
+                    equipoLocal = it.equipoLocal ?: "Desconocido",
+                    codigoLocal = it.equipoLocal?.take(3)?.uppercase() ?: "XXX",
+                    equipoVisitante = it.equipoVisitante ?: "Desconocido",
+                    codigoVisitante = it.equipoVisitante?.take(3)?.uppercase() ?: "XXX",
+                    estadio = it.estadioNombre ?: "Desconocido",
+                    fecha = it.fecha ?: "",
+                    hora = it.hora ?: "",
+                    precio = 50.0, // Valor por defecto
+                    entradasDisponibles = 100,
+                    dateIso = "${it.fecha ?: ""}T${it.hora ?: ""}"
+                )
+            }
+            db.withTransaction {
                 partidoDao.deleteAllPartidos()
                 partidoDao.insertPartidos(entities)
             }
@@ -40,8 +57,22 @@ class PartidosRepositoryImpl(
         }
     }
 
-    override fun getPartidosFlow(): Flow<List<Partido>> {
-        return partidoDao.getPartidosFlow().map { list -> list.map { it.toDomain() } }
+    override fun getPastPartidosFlow(query: String): Flow<List<Partido>> {
+        val nowIso = Instant.now().atZone(ZoneId.of("America/Argentina/Buenos_Aires"))
+            .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"))
+        
+        return partidoDao.getPastPartidosFlow(query, nowIso).map { list ->
+            list.map { it.toDomain() }
+        }
+    }
+
+    override fun getUpcomingPartidosFlow(query: String): Flow<List<Partido>> {
+        val nowIso = Instant.now().atZone(ZoneId.of("America/Argentina/Buenos_Aires"))
+            .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"))
+        
+        return partidoDao.getUpcomingPartidosFlow(query, nowIso).map { list ->
+            list.map { it.toDomain() }
+        }
     }
 
     override suspend fun getPartidoById(partidoId: String): Partido? {

@@ -40,7 +40,7 @@ object AppModule {
             context,
             AppDatabase::class.java,
             "partidos_db"
-        ).fallbackToDestructiveMigration().build()
+        ).fallbackToDestructiveMigration(dropAllTables = true).build()
     }
 
     @Provides
@@ -116,10 +116,9 @@ object AppModule {
     @Singleton
     fun providePartidosRepository(
         api: PartidosApi,
-        partidoDao: PartidoDao,
-        compraDao: CompraDao
+        db: AppDatabase
     ): PartidosRepository {
-        return PartidosRepositoryImpl(api, partidoDao, compraDao)
+        return PartidosRepositoryImpl(api, db)
     }
 }
 

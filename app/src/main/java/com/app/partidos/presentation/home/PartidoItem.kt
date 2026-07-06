@@ -12,6 +12,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.app.partidos.R
 import com.app.partidos.domain.model.Partido
 
 @Composable
@@ -30,13 +32,13 @@ fun PartidoItem(partido: Partido, isPast: Boolean = false, onClick: () -> Unit) 
                 style = MaterialTheme.typography.titleLarge,
                 color = Color.White
             )
-            Text("🏟 Estadio: ${partido.estadio}", color = Color.White)
-            Text("📅 Fecha: ${partido.fecha}", color = Color.White)
-            Text("🕒 Hora: ${partido.hora}", color = Color.White)
-            if (partido.disponible) {
-                Text("🎟 Entradas disponibles: ${partido.entradasDisponibles}", color = Color.White)
+            Text(stringResource(R.string.match_detail_stadium, partido.estadio), color = Color.White)
+            Text(stringResource(R.string.match_detail_date, partido.fecha), color = Color.White)
+            Text(stringResource(R.string.match_detail_time, partido.hora), color = Color.White)
+            if (partido.entradasDisponibles > 0) {
+                Text(stringResource(R.string.match_detail_available_tickets, partido.entradasDisponibles), color = Color.White)
             } else {
-                Text("❌ Agotado", color = Color.Yellow)
+                Text(stringResource(R.string.match_detail_sold_out), color = Color.Yellow)
             }
         }
     }

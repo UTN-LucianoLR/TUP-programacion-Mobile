@@ -13,4 +13,7 @@ interface AuthApiService {
 
     @POST("api/auth/registrar")
     suspend fun registrar(@Body request: RegistroRequestDto): Response<Unit>
+
+    @POST("api/auth/recuperar-password")
+    suspend fun recuperarPassword(@Body request: com.app.partidos.data.remote.dto.RecuperarPasswordDto): Response<Unit>
 }

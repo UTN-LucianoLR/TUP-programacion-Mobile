@@ -16,6 +16,8 @@ import androidx.compose.ui.layout.ContentScale
 import coil.ImageLoader
 import coil.compose.SubcomposeAsyncImage
 import coil.decode.SvgDecoder
+import androidx.compose.ui.res.stringResource
+import com.app.partidos.R
 
 @Composable
 fun MatchDetailScreen(
@@ -49,13 +51,13 @@ fun MatchDetailScreen(
                 is MatchDetailUiState.Error -> {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("Error: ${state.message}", color = MaterialTheme.colorScheme.error)
+                            Text(stringResource(R.string.error_message, state.message), color = MaterialTheme.colorScheme.error)
                             Button(
                                 onClick = onNavigateBack,
                                 modifier = Modifier.padding(top = 16.dp),
                                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE63946))
                             ) {
-                                Text("Volver al Listado")
+                                Text(stringResource(R.string.match_detail_back_to_list))
                             }
                         }
                     }
@@ -90,7 +92,7 @@ fun MatchDetailScreen(
                                     loading = { CircularProgressIndicator(modifier = Modifier.padding(8.dp), strokeWidth = 2.dp) }
                                 )
                                 Text(
-                                    text = "${partido.equipoLocal} vs ${partido.equipoVisitante}",
+                                    text = "${partido.equipoLocal} ${stringResource(R.string.match_detail_vs)} ${partido.equipoVisitante}",
                                     style = MaterialTheme.typography.titleLarge,
                                     color = Color.White
                                 )
@@ -104,12 +106,12 @@ fun MatchDetailScreen(
                                 )
                             }
 
-                            Text("🏟 Estadio: ${partido.estadio}", color = Color.White)
-                            Text("📅 Fecha: ${partido.fecha}", color = Color.White)
-                            Text("🕒 Hora: ${partido.hora}", color = Color.White)
-                            Text("💲 Precio unitario: \$${partido.precio}", color = Color.White)
+                            Text(stringResource(R.string.match_detail_stadium, partido.estadio), color = Color.White)
+                            Text(stringResource(R.string.match_detail_date, partido.fecha), color = Color.White)
+                            Text(stringResource(R.string.match_detail_time, partido.hora), color = Color.White)
+                            Text(stringResource(R.string.match_detail_price, partido.precio.toString()), color = Color.White)
                             Text(
-                                text = if (isPastMatch) "🏁 Partido finalizado" else if (partido.disponible) "🎟 Entradas disponibles: ${partido.entradasDisponibles}" else "❌ Agotado",
+                                text = if (isPastMatch) stringResource(R.string.match_detail_finished) else if (partido.disponible) stringResource(R.string.match_detail_available_tickets, partido.entradasDisponibles) else stringResource(R.string.match_detail_sold_out),
                                 color = if (isPastMatch || partido.disponible) Color.White else Color.Yellow,
                                 modifier = Modifier.padding(top = 8.dp)
                             )
@@ -128,7 +130,7 @@ fun MatchDetailScreen(
                             modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE63946))
                         ) {
-                            Text("Comprar Entradas")
+                            Text(stringResource(R.string.match_detail_buy_tickets))
                         }
                     }
 
@@ -136,7 +138,7 @@ fun MatchDetailScreen(
                         onClick = onNavigateBack,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("Volver", color = Color.White)
+                        Text(stringResource(R.string.back_button), color = Color.White)
                     }
                 }
             }
